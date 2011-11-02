@@ -389,8 +389,9 @@ class ArcButton extends Sprite
 		{
 			var angle = _bg.rotation * Math.PI / 180;
 			_icon.x = Math.round(-_icon.width / 2);
-			_icon.y = Math.round(-_icon.height / 2);
-			_iconHolder.addChild(_icon);
+			_icon.y = Math.round( -_icon.height / 2);
+			//_iconHolder.addChild(_icon);
+			_icon.addToDisplay(_iconHolder);
 			_iconHolder.x = Math.round(Math.cos(angle + _arc / 2) * _iconRadius);
 			_iconHolder.y = Math.round(Math.sin(angle + _arc / 2) * _iconRadius);
 		}

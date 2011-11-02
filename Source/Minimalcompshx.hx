@@ -2,10 +2,7 @@ package;
 
 /*
 import com.bit101.components.Accordion;
-import com.bit101.components.HUISlider;
-import com.bit101.components.WheelMenu;
 import com.bit101.components.ScrollPane;
-import com.bit101.components.VUISlider;
 import com.bit101.components.Window;
 */
 
@@ -23,6 +20,7 @@ import com.bit101.components.FPSMeter;
 import com.bit101.components.HBox;
 import com.bit101.components.HRangeSlider;
 import com.bit101.components.HSlider;
+import com.bit101.components.HUISlider;
 import com.bit101.components.IndicatorLight;
 import com.bit101.components.InputText;
 import com.bit101.components.Knob;
@@ -45,7 +43,8 @@ import com.bit101.components.TextArea;
 import com.bit101.components.VBox;
 import com.bit101.components.VRangeSlider;
 import com.bit101.components.VSlider;
-
+import com.bit101.components.VUISlider;
+import com.bit101.components.WheelMenu;
 
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -60,10 +59,11 @@ import flash.display.StageScaleMode;
  * @author Zaphod
  */
 class Minimalcompshx extends Sprite {
-	private var vSlider:VSlider;
+	private var vSlider:VUISlider;
 	private var vBox:VBox;
 	private var hBox:HBox;
 	private var hSlider:HSlider;
+	private var wheel:WheelMenu;
 	
 	public function new () {
 		
@@ -121,7 +121,8 @@ class Minimalcompshx extends Sprite {
 		stepper.maximum = 100;
 		
 		var range:RangeSlider = new RangeSlider(Slider.HORIZONTAL, container, progress.x, stepper.y + 40);
-		var slider:Slider = new Slider(Slider.HORIZONTAL, container, range.x, range.y + 20);
+		//var slider:Slider = new Slider(Slider.HORIZONTAL, container, range.x, range.y + 20);
+		var slider:HUISlider = new HUISlider(container, range.x, range.y + 20);
 		
 		var calendar:Calendar = new Calendar(container, slider.x, slider.y + 20);
 		
@@ -131,6 +132,7 @@ class Minimalcompshx extends Sprite {
 		{
 			list.addItem(Std.string(i));
 		}
+		list.removeItem("45");
 		list.numItemsToShow = 6;
 		list.scrollToSelection();
 		
@@ -148,7 +150,7 @@ class Minimalcompshx extends Sprite {
 		hBox.setSize(80, hBox.height);
 		hBox.spacing = 30;
 		
-		vSlider = new VSlider(hBox, 0, 0, onVSlider);
+		vSlider = new VUISlider(hBox, 0, 0, onVSlider);
 		vSlider.minimum = 30;
 		vSlider.maximum = 60;
 		
@@ -159,6 +161,7 @@ class Minimalcompshx extends Sprite {
 		{
 			comboBox.addItem(Std.string(i));
 		}
+		comboBox.removeItem("25");
 		
 		var textArea:TextArea = new TextArea(container, comboBox.x, comboBox.y + comboBox.height + 20);
 		
@@ -173,13 +176,26 @@ class Minimalcompshx extends Sprite {
 		rotatorySelector.y += rotatorySelector.height * 0.5;
 		rotatorySelector.numChoices = 4;
 		
+		var wheelFeeler:Sprite = new Sprite();
+		wheelFeeler.graphics.beginFill(0xcccccc);
+		wheelFeeler.graphics.drawRect(0, 0, 20, 20);
+		wheelFeeler.graphics.endFill();
+		wheelFeeler.x = 600;
+		wheelFeeler.y = 300;
+		addChild(wheelFeeler);
+		wheelFeeler.addEventListener(MouseEvent.CLICK, onWheelFeelerClick);
+		
+		wheel = new WheelMenu(Lib.current, 5);
+		for (i in 0...5)
+		{
+			wheel.setItem(i, Std.string(i));
+		}
+		
+		
 		/*
 		var window:Window = new Window(Lib.current);
 		window.hasMinimizeButton = true;
 		window.hasCloseButton = true;
-		
-		var selector:RotarySelector = new RotarySelector(Lib.current, 500, 50);
-		selector.numChoices = 4;
 		
 		var panel:Panel = new Panel(Lib.current, 100, 350);
 		
@@ -191,9 +207,12 @@ class Minimalcompshx extends Sprite {
 		//window2.addChild(list);
 		window2.setSize(list.width, list.height);
 		window2.hasMinimizeButton = true;
-		
-		list.removeItem("1");
 		*/
+	}
+	
+	public function onWheelFeelerClick(e:MouseEvent):Void 
+	{
+		wheel.show();
 	}
 	
 	public function onHSlider(e:Event):Void 
