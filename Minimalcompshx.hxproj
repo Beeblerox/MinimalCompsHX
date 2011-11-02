@@ -39,7 +39,8 @@
     <!-- example: <hidden path="..." /> -->
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>haxelib run nme test "Minimalcompshx.nmml" flash</preBuildCommand>
+  <preBuildCommand>haxelib run nme test "Minimalcompshx.nmml" flash
+haxelib run nme test "Minimalcompshx.nmml" cpp</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

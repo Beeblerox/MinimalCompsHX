@@ -46,6 +46,10 @@ class PushButton extends Component
 	var _selected:Bool;
 	var _toggle:Bool;
 	
+	#if !flash
+	var _clickableArea:Sprite;
+	#end
+	
 	/**
 	 * Constructor
 	 * @param parent The parent DisplayObjectContainer on which to add this PushButton.
@@ -105,6 +109,12 @@ class PushButton extends Component
 		_label = new Label();
 		addChild(_label);
 		
+		#if !flash
+		_clickableArea = new Sprite();
+		_clickableArea.alpha = 0;
+		addChild(_clickableArea);
+		#end
+		
 		addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
 		addEventListener(MouseEvent.ROLL_OVER, onMouseOver);
 	}
@@ -160,6 +170,12 @@ class PushButton extends Component
 		_label.draw();
 		_label.move(_width / 2 - _label.width / 2, _height / 2 - _label.height / 2);
 		
+		#if !flash
+		_clickableArea.graphics.clear();
+		_clickableArea.graphics.beginFill(Style.BACKGROUND);
+		_clickableArea.graphics.drawRect(0, 0, _width, _height);
+		_clickableArea.graphics.endFill();
+		#end
 	}
 	
 	
@@ -188,7 +204,9 @@ class PushButton extends Component
 		_over = false;
 		if(!_down)
 		{
+			#if flash
 			_face.filters = [getShadow(1)];
+			#end
 		}
 		removeEventListener(MouseEvent.ROLL_OUT, onMouseOut);
 	}
@@ -201,7 +219,9 @@ class PushButton extends Component
 	{
 		_down = true;
 		drawFace();
+		#if flash
 		_face.filters = [getShadow(1, true)];
+		#end
 		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
@@ -217,7 +237,9 @@ class PushButton extends Component
 		}
 		_down = _selected;
 		drawFace();
+		#if flash
 		_face.filters = [getShadow(1, _selected)];
+		#end
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
@@ -251,7 +273,9 @@ class PushButton extends Component
 		
 		_selected = value;
 		_down = _selected;
+		#if flash
 		_face.filters = [getShadow(1, _selected)];
+		#end
 		drawFace();
 		return value;
 	}
@@ -268,6 +292,26 @@ class PushButton extends Component
 	public function getToggle():Bool
 	{
 		return _toggle;
+	}
+	
+	/********** Sprite composition ***************/
+	override public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	{
+		#if flash
+		super.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#else
+		_clickableArea.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#end
+	}
+	
+	override public function removeEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false):Void 
+	{
+		
+		#if flash
+		super.removeEventListener(type, listener, useCapture);
+		#else
+		_clickableArea.removeEventListener(type, listener, useCapture);
+		#end
 	}
 	
 }

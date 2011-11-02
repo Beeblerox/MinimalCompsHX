@@ -148,7 +148,11 @@ class TextArea extends Text
 	 */
 	function onMouseWheel(event:MouseEvent):Void
 	{
+		#if flash
 		_scrollbar.value -= event.delta;
+		#else
+		_scrollbar.value += event.delta;
+		#end
 		_tf.scrollV = Math.round(_scrollbar.value);
 	}
 

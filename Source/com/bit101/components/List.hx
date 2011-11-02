@@ -296,6 +296,12 @@ class List extends Component
 		_scrollbar.height = _height;
 		_scrollbar.draw();
 		scrollToSelection();
+		
+		#if !flash
+		graphics.clear();
+		graphics.lineStyle(1, 0, 0.1);
+		graphics.drawRect(-1, -1, width + 1, height + 1);
+		#end
 	}
 	
 	/**
@@ -410,7 +416,11 @@ class List extends Component
 	 */
 	function onMouseWheel(event:MouseEvent):Void
 	{
+		#if flash
 		_scrollbar.value -= event.delta;
+		#else
+		_scrollbar.value += event.delta;
+		#end
 		fillItems();
 	}
 

@@ -44,6 +44,9 @@ class CheckBox extends Component
 	var _labelText:String;
 	var _selected:Bool;
 	
+	#if !flash
+	var _clickableArea:Sprite;
+	#end
 	
 	/**
 	 * Constructor
@@ -58,8 +61,13 @@ class CheckBox extends Component
 		_labelText = "";
 		_selected = false;
 		
+		#if !flash
+		_clickableArea = new Sprite();
+		#end
+		
 		_labelText = label;
 		super(parent, xpos, ypos);
+		
 		if(defaultHandler != null)
 		{
 			addEventListener(MouseEvent.CLICK, defaultHandler);
@@ -97,6 +105,11 @@ class CheckBox extends Component
 		_label = new Label(this, 0, 0, _labelText);
 		draw();
 		
+		#if !flash
+		addChild(_clickableArea);
+		_clickableArea.alpha = 0.0;
+		#end
+		
 		addEventListener(MouseEvent.CLICK, onClick);
 	}
 	
@@ -128,6 +141,13 @@ class CheckBox extends Component
 		_label.y = (10 - _label.height) / 2;
 		_width = _label.width + 12;
 		_height = 10;
+		
+		#if !flash
+		_clickableArea.graphics.clear();
+		_clickableArea.graphics.beginFill(0);
+		_clickableArea.graphics.drawRect(0, 0, _width, height);
+		_clickableArea.graphics.endFill();
+		#end
 	}
 	
 	
@@ -194,6 +214,24 @@ class CheckBox extends Component
 		super.setEnabled(value);
 		mouseChildren = false;
 		return value;
+	}
+	
+	override public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	{
+		#if flash
+		super.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#else
+		_clickableArea.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#end
+	}
+	
+	override public function removeEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false):Void 
+	{
+		#if flash
+		super.removeEventListener(type, listener, useCapture);
+		#else
+		_clickableArea.removeEventListener(type, listener, useCapture);
+		#end
 	}
 
 }

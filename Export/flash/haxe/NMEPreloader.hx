@@ -1,4 +1,4 @@
-import flash.display.Sprite;
+import nme.display.Sprite;
 
 class NMEPreloader extends Sprite
 {
@@ -9,8 +9,8 @@ class NMEPreloader extends Sprite
 
    public function onInit() {}
 
-   public function getWidth():Float { return 640; }
-   public function getHeight():Float { return 480; }
+   public function getWidth():Float { return 400; }
+   public function getHeight():Float { return 300; }
 
    public function onUpdate(inBytes:Int,inTotal:Int)
    {

@@ -29,10 +29,6 @@
 
 package com.bit101.components;
 
-/*#if neash
-typedef Int = Int;
-#end*/
-
 class Style
 {
 	public static var TEXT_BACKGROUND:Int = 0xFFFFFF;
@@ -50,9 +46,13 @@ class Style
 	public static var LIST_ROLLOVER:Int = 0xDDDDDD;
 	
 	public static var embedFonts:Bool = true;
-	//public static var fontName:String = "PF Ronda Seven";
+	#if flash
 	public static var fontName:String = "assets/pf_ronda_seven";
 	public static var fontSize:Float = 8;
+	#else
+	public static var fontName:String = "_sans";
+	public static var fontSize:Float = 11;
+	#end
 	
 	public inline static var DARK:String = "dark";
 	public inline static var BLACK:String = "black";

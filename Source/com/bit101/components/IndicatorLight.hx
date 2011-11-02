@@ -106,6 +106,7 @@ class IndicatorLight extends Component
 	function drawLite():Void
 	{
 		var colors:Array<Int>;
+		#if flash
 		if(_lit)
 		{
 			colors = [0xffffff, _color];
@@ -114,11 +115,24 @@ class IndicatorLight extends Component
 		{
 			colors = [0xffffff, 0];
 		}
-		
+		#else
+		if(_lit)
+		{
+			colors = [0xffffff, _color];
+		}
+		else
+		{
+			colors = [0xffffff, Style.BACKGROUND];
+		}
+		#end
 		_lite.graphics.clear();
+		#if flash
 		var matrix:Matrix = new Matrix();
 		matrix.createGradientBox(10, 10, 0, -2.5, -2.5);
 		_lite.graphics.beginGradientFill(GradientType.RADIAL, colors, [1, 1], [0, 255], matrix);
+		#else
+		_lite.graphics.beginFill(colors[1]);
+		#end
 		_lite.graphics.drawCircle(5, 5, 5);
 		_lite.graphics.endFill();
 	}
@@ -173,8 +187,7 @@ class IndicatorLight extends Component
 			isLit = false;
 			return;
 		}
-		//_timer.delay = interval;
-		//_timer.start();
+		
 		_timer = new Timer(interval);
 		_timer.run = onTimer;
 		_timerRunning = true;

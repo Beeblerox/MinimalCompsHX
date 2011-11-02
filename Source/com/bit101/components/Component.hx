@@ -44,6 +44,7 @@ import flash.filters.DropShadowFilter;
 import flash.events.IEventDispatcher;
 import flash.display.Graphics;
 import flash.geom.Point;
+import flash.Lib;
 import flash.text.Font;
 
 class PFRondaSeven extends flash.text.Font {}
@@ -420,6 +421,12 @@ class Component implements IEventDispatcher
 	public function getMouseChildren():Bool
 	{
 		return _comp.mouseChildren;
+	}
+	
+	public function setMouseChildren(val:Bool):Bool
+	{
+		_comp.mouseChildren = val;
+		return val;
 	}
 
 	public function getButtonMode():Bool

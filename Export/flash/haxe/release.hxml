@@ -1,9 +1,8 @@
 -main ApplicationMain 
 -D nme_install_tool
 -cp Source
--lib actuate
--swf-version 9
--swf Export/flash/bin/MyApplication.swf
--swf-header 640:480:30:ffffff
+-lib nme
+-swf-version 10
+-swf9 Export/flash/bin/FlixelNMETest.swf
+-swf-header 400:300:30:ffffff
 -cp Export/flash/haxe
-

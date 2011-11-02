@@ -81,7 +81,9 @@ class InputText extends Component
 	override function addChildren():Void
 	{
 		_back = new Sprite();
+		#if flash
 		_back.filters = [getShadow(2, true)];
+		#end
 		addChild(_back);
 		
 		_tf = new TextField();
@@ -110,7 +112,17 @@ class InputText extends Component
 	{
 		super.draw();
 		_back.graphics.clear();
+		
+		#if !flash
+		_back.graphics.lineStyle(1, 0, 0.1);
+		#end
+		
+		#if flash
 		_back.graphics.beginFill(Style.BACKGROUND);
+		#else
+		_back.graphics.beginFill(Style.PANEL);
+		#end
+		
 		_back.graphics.drawRect(0, 0, _width, _height);
 		_back.graphics.endFill();
 		

@@ -45,11 +45,6 @@ import flash.events.MouseEvent;
 import flash.geom.Matrix;
 import flash.geom.Point;
 
-#if !flash
-import nme.geom.ColorTransform;
-import nme.geom.Rectangle;
-#end
-
 class ColorChooser extends Component
 {
 	
@@ -135,7 +130,9 @@ class ColorChooser extends Component
 		
 		_swatch = new Sprite();
 		_swatch.x = 50;
+		#if flash
 		_swatch.filters = [getShadow(2, true)];
+		#end
 		addChild(_swatch);
 		
 		_colorsContainer = new Sprite();
@@ -363,7 +360,7 @@ class ColorChooser extends Component
 	{
 		var point:Point = new Point(x, y);
 		// TODO: LocalToLocal the x and y to place it properly.
-		if(parent) point = parent.localToGlobal(point);
+		if(parent != null) point = parent.localToGlobal(point);
 		switch (_popupAlign)
 		{
 			case TOP : 
@@ -390,8 +387,12 @@ class ColorChooser extends Component
 		
 		var g1:Sprite = getGradientSprite(w, h, _defaultModelColors);
 		bmd.draw(g1);
-				
+		
+		#if flash 
 		var blendmodes = [BlendMode.MULTIPLY, BlendMode.ADD];
+		#else
+		var blendmodes = ["multiply", "add"];
+		#end
 		var nb:Int = blendmodes.length;
 		var g2:Sprite = getGradientSprite(h/nb, w, [0xFFFFFF, 0x000000]);		
 		
@@ -401,12 +402,8 @@ class ColorChooser extends Component
 			var m:Matrix = new Matrix();
 			m.rotate(-Math.PI / 2);
 			m.translate(0, h / nb * i + h/nb);
-			#if flash 
+			
 			bmd.draw(g2, m, null, blendmode);
-			#else
-			//bmd.draw(g2, m, new ColorTransform(), blendmode);
-			bmd.draw(g2, m);
-			#end
 		}
 		
 		var s:Sprite = new Sprite();

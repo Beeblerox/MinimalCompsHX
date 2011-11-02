@@ -49,6 +49,9 @@ class RadioButton extends Component
 	
 	static var buttons:Array<RadioButton>;
 	
+	#if !flash
+	var _clickableArea:Sprite;
+	#end
 	
 	/**
 	 * Constructor
@@ -67,6 +70,11 @@ class RadioButton extends Component
 		RadioButton.addButton(this);
 		_selected = checked;
 		_labelText = label;
+		
+		#if !flash
+		_clickableArea = new Sprite();
+		#end
+		
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -123,16 +131,25 @@ class RadioButton extends Component
 	override function addChildren():Void
 	{
 		_back = new Sprite();
+		#if flash
 		_back.filters = [getShadow(2, true)];
+		#end
 		addChild(_back);
 		
 		_button = new Sprite();
+		#if flash
 		_button.filters = [getShadow(1)];
+		#end
 		_button.visible = false;
 		addChild(_button);
 		
 		_label = new Label(this, 0, 0, _labelText);
 		draw();
+		
+		#if !flash
+		addChild(_clickableArea);
+		_clickableArea.alpha = 0.0;
+		#end
 		
 		mouseChildren = false;
 	}
@@ -167,6 +184,13 @@ class RadioButton extends Component
 		_label.draw();
 		_width = _label.width + 12;
 		_height = 10;
+		
+		#if !flash
+		_clickableArea.graphics.clear();
+		_clickableArea.graphics.beginFill(0);
+		_clickableArea.graphics.drawRect(0, 0, _width, height);
+		_clickableArea.graphics.endFill();
+		#end
 	}
 	
 	
@@ -251,6 +275,25 @@ class RadioButton extends Component
 			if (rb.groupName == groupName && rb.selected) return rb.label;
 		}
 		return '';
+	}
+	
+	
+	override public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	{
+		#if flash
+		super.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#else
+		_clickableArea.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#end
+	}
+	
+	override public function removeEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false):Void 
+	{
+		#if flash
+		super.removeEventListener(type, listener, useCapture);
+		#else
+		_clickableArea.removeEventListener(type, listener, useCapture);
+		#end
 	}
 	
 }

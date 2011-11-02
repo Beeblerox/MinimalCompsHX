@@ -233,6 +233,7 @@ class Panel extends Component
 	public function setShadowBool(b:Bool):Bool
 	{
 		_shadow = b;
+		#if flash
 		if(_shadow)
 		{
 			filters = [getShadow(2, true)];
@@ -241,6 +242,7 @@ class Panel extends Component
 		{
 			filters = [];
 		}
+		#end
 		return b;
 	}
 	
