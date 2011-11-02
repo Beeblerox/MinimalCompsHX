@@ -257,7 +257,11 @@ class RotarySelector extends Component
 	{
 		//var lab:Label = cast(event.target, Label);
 		//choice = _labels.getChildIndex(lab);
+		#if flash
 		choice = _labels.getChildIndex(event.target);
+		#else
+		choice = _labels.getChildIndex(event.target.parent);
+		#end
 	}
 	
 	

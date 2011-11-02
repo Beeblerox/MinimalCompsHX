@@ -444,9 +444,11 @@ class ScrollSlider extends Slider
 		{
 			size = Math.round(_width * _thumbPercent);
 			size = Math.max(_height, size);
+			#if flash
 			_handle.graphics.beginFill(0, 0);
 			_handle.graphics.drawRect(0, 0, size, _height);
 			_handle.graphics.endFill();
+			#end
 			_handle.graphics.beginFill(Style.BUTTON_FACE);
 			_handle.graphics.drawRect(1, 1, size - 2, _height - 2);
 		}
@@ -454,9 +456,11 @@ class ScrollSlider extends Slider
 		{
 			size = Math.round(_height * _thumbPercent);
 			size = Math.max(_width, size);
+			#if flash
 			_handle.graphics.beginFill(0, 0);
 			_handle.graphics.drawRect(0, 0, _width  - 2, size);
 			_handle.graphics.endFill();
+			#end
 			_handle.graphics.beginFill(Style.BUTTON_FACE);
 			_handle.graphics.drawRect(1, 1, _width - 2, size - 2);
 		}
@@ -480,6 +484,11 @@ class ScrollSlider extends Slider
 		{
 			range = height - _handle.height;
 			_handle.y = (_value - _min) / (_max - _min) * range;
+		}
+		
+		if (_handle.y < 0 || Math.isNaN(_handle.y))
+		{
+			_handle.y = 0;
 		}
 	}
 	

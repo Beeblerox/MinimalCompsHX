@@ -3,11 +3,7 @@ package;
 /*
 import com.bit101.components.Accordion;
 import com.bit101.components.HUISlider;
-import com.bit101.components.Knob;
-import com.bit101.components.ListItem;
 import com.bit101.components.WheelMenu;
-import com.bit101.components.RotarySelector;
-import com.bit101.components.ScrollBar;
 import com.bit101.components.ScrollPane;
 import com.bit101.components.VUISlider;
 import com.bit101.components.Window;
@@ -29,8 +25,10 @@ import com.bit101.components.HRangeSlider;
 import com.bit101.components.HSlider;
 import com.bit101.components.IndicatorLight;
 import com.bit101.components.InputText;
+import com.bit101.components.Knob;
 import com.bit101.components.Label;
 import com.bit101.components.List;
+import com.bit101.components.ListItem;
 import com.bit101.components.Meter;
 import com.bit101.components.NumericStepper;
 import com.bit101.components.Panel;
@@ -38,6 +36,8 @@ import com.bit101.components.ProgressBar;
 import com.bit101.components.PushButton;
 import com.bit101.components.RadioButton;
 import com.bit101.components.RangeSlider;
+import com.bit101.components.RotarySelector;
+import com.bit101.components.ScrollBar;
 import com.bit101.components.Slider;
 import com.bit101.components.Style;
 import com.bit101.components.Text;
@@ -165,6 +165,14 @@ class Minimalcompshx extends Sprite {
 		var colorChooser:ColorChooser = new ColorChooser(container, 10, textArea.y + textArea.height + 20);
 		colorChooser.usePopup = true;
 		
+		var knob:Knob = new Knob(container, list.x, lineChart.y);
+		
+		var scroll:ScrollBar = new ScrollBar(Slider.VERTICAL, container, list.x + list.width + 20, list.y);
+		
+		var rotatorySelector:RotarySelector = new RotarySelector(container, knob.x + knob.width + 20, knob.y);
+		rotatorySelector.y += rotatorySelector.height * 0.5;
+		rotatorySelector.numChoices = 4;
+		
 		/*
 		var window:Window = new Window(Lib.current);
 		window.hasMinimizeButton = true;
@@ -172,11 +180,6 @@ class Minimalcompshx extends Sprite {
 		
 		var selector:RotarySelector = new RotarySelector(Lib.current, 500, 50);
 		selector.numChoices = 4;
-		
-		var knob:Knob = new Knob(window, 20);
-		knob.mode = Knob.HORIZONTAL;
-		
-		var calendar:Calendar = new Calendar(Lib.current, 400, 350);
 		
 		var panel:Panel = new Panel(Lib.current, 100, 350);
 		
