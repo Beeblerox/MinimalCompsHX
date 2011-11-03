@@ -4,6 +4,7 @@ import com.bit101.charts.BarChart;
 import com.bit101.charts.Chart;
 import com.bit101.charts.LineChart;
 import com.bit101.charts.PieChart;
+import com.bit101.components.TabPanel;
 
 import com.bit101.components.Accordion;
 import com.bit101.components.Calendar;
@@ -206,26 +207,20 @@ class Minimalcompshx extends Sprite {
 		
 		var accordion:Accordion = new Accordion(container, scroll.x + scroll.width + 20, scroll.y);
 		
-		var list2:List = new List(accordion.getWindowAt(0));
+		var tabPanel:TabPanel = new TabPanel(container, accordion.x + accordion.width + 20, accordion.y);
+		
+		var list2:List = new List(tabPanel.getTabAt(1));
 		
 		for (i in 1...50)
 		{
 			list2.addItem(Std.string(i));
 		}
 		#if flash
-		list2.setSize(list2.width, accordion.getWindowAt(0).height - 20);
+		list2.setSize(list2.width, tabPanel.getTabAt(0).height);
 		#else
-		list2.setSize(list2.width, accordion.getWindowAt(0).height - 40);
+		list2.setSize(list2.width, 120);
 		#end
 		//list2.autoHeight = true;
-		
-		/*
-		var panel:Panel = new Panel(Lib.current, 100, 350);
-		
-		
-		accordion.setSize(panel.width, panel.height);
-		panel.addChild(accordion);
-		*/
 	}
 	
 	public function onWheelFeelerClick(e:MouseEvent):Void 
