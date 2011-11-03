@@ -486,6 +486,11 @@ class ScrollSlider extends Slider
 			_handle.y = (_value - _min) / (_max - _min) * range;
 		}
 		
+		if (_handle.x < 0 || Math.isNaN(_handle.x))
+		{
+			_handle.x = 0;
+		}
+		
 		if (_handle.y < 0 || Math.isNaN(_handle.y))
 		{
 			_handle.y = 0;

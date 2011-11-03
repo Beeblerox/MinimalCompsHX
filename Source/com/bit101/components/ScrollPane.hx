@@ -130,6 +130,7 @@ class ScrollPane extends Panel
 			_hScrollbar.width = width - 10;
 			_mask.width = width - 10;
 		}
+		
 		_vScrollbar.setThumbPercent(vPercent);
 		_vScrollbar.maximum = Math.max(0, content.height - _height + 10);
 		_vScrollbar.pageSize = Std.int(_height - 10);

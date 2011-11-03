@@ -148,7 +148,7 @@ class List extends Component
 			item.removeEventListener(MouseEvent.CLICK, onSelect);
 			_itemHolder.removeChildAt(0);
 		}*/
-		while(_itemHolder.numChildren > 0)
+		while (_itemHolder.numChildren > 0)
 		{
 			displayItem = _itemHolder.getChildAt(0);
 			displayItem.removeEventListener(MouseEvent.CLICK, onSelect);
@@ -177,6 +177,7 @@ class List extends Component
 		var offset:Int = Std.int(_scrollbar.value);
 		var numItems:Int = Math.ceil(_height / _listItemHeight);
 		numItems = Std.int(Math.min(cast(numItems, Float), cast(_items.length, Float)));
+		
 		// TODO: Fix this
 		if (_autoHeight)
 		{
@@ -184,34 +185,6 @@ class List extends Component
 		}
 		// TODO: Fix this
 		var item:ListItem;
-		/*for (i in 0...numItems)
-		{
-			item = cast(_itemHolder.getChildAt(i), ListItem);
-			if(offset + i < _items.length)
-			{
-				item.data = _items[offset + i];
-			}
-			else
-			{
-				item.data = "";
-			}
-			if(_alternateRows)
-			{
-				item.defaultColor = ((offset + i) % 2 == 0) ? _defaultColor : _alternateColor;
-			}
-			else
-			{
-				item.defaultColor = _defaultColor;
-			}
-			if(offset + i == _selectedIndex)
-			{
-				item.selected = true;
-			}
-			else
-			{
-				item.selected = false;
-			}
-		}*/
 		for (i in 0...numItems)
 		{
 			item = cast(_listItems[i], ListItem);
@@ -290,7 +263,11 @@ class List extends Component
 		_scrollbar.x = _width - 10;
 		var contentHeight:Float = _items.length * _listItemHeight;
 		_scrollbar.setThumbPercent(_height / contentHeight); 
+		#if flash
 		var pageSize:Float = Math.floor(_height / _listItemHeight);
+		#else
+		var pageSize:Float = Math.ceil(_height / _listItemHeight);
+		#end
 		_scrollbar.maximum = Math.max(0, _items.length - pageSize);
 		_scrollbar.pageSize = Std.int(pageSize);
 		_scrollbar.height = _height;

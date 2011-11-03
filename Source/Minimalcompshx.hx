@@ -1,16 +1,11 @@
 package;
 
-/*
-import com.bit101.components.Accordion;
-import com.bit101.components.ScrollPane;
-import com.bit101.components.Window;
-*/
-
 import com.bit101.charts.BarChart;
 import com.bit101.charts.Chart;
 import com.bit101.charts.LineChart;
 import com.bit101.charts.PieChart;
 
+import com.bit101.components.Accordion;
 import com.bit101.components.Calendar;
 import com.bit101.components.CheckBox;
 import com.bit101.components.ColorChooser;
@@ -36,6 +31,7 @@ import com.bit101.components.RadioButton;
 import com.bit101.components.RangeSlider;
 import com.bit101.components.RotarySelector;
 import com.bit101.components.ScrollBar;
+import com.bit101.components.ScrollPane;
 import com.bit101.components.Slider;
 import com.bit101.components.Style;
 import com.bit101.components.Text;
@@ -45,6 +41,7 @@ import com.bit101.components.VRangeSlider;
 import com.bit101.components.VSlider;
 import com.bit101.components.VUISlider;
 import com.bit101.components.WheelMenu;
+import com.bit101.components.Window;
 
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -68,6 +65,8 @@ class Minimalcompshx extends Sprite {
 	public function new () {
 		
 		super ();
+		
+		Lib.current.stage.frameRate = 60;
 		
 		initialize ();
 		
@@ -191,22 +190,41 @@ class Minimalcompshx extends Sprite {
 			wheel.setItem(i, Std.string(i));
 		}
 		
-		
-		/*
 		var window:Window = new Window(Lib.current);
 		window.hasMinimizeButton = true;
 		window.hasCloseButton = true;
 		
+		var comboBox2:ComboBox = new ComboBox(window, 0, 0, "label");
+		for (i in 1...30)
+		{
+			comboBox2.addItem(Std.string(i));
+		}
+		
+		var pane:ScrollPane = new ScrollPane(container, 600, panel.y);
+		pane.setSize(200, 100);
+		var pieChart:PieChart = new PieChart(pane, 0, 0, [1, 2, 3]);
+		
+		var accordion:Accordion = new Accordion(container, scroll.x + scroll.width + 20, scroll.y);
+		
+		var list2:List = new List(accordion.getWindowAt(0));
+		
+		for (i in 1...50)
+		{
+			list2.addItem(Std.string(i));
+		}
+		#if flash
+		list2.setSize(list2.width, accordion.getWindowAt(0).height - 20);
+		#else
+		list2.setSize(list2.width, accordion.getWindowAt(0).height - 40);
+		#end
+		//list2.autoHeight = true;
+		
+		/*
 		var panel:Panel = new Panel(Lib.current, 100, 350);
 		
-		var accordion:Accordion = new Accordion(Lib.current);
+		
 		accordion.setSize(panel.width, panel.height);
 		panel.addChild(accordion);
-		
-		var window2:Window = new Window(Lib.current, 200, 200);
-		//window2.addChild(list);
-		window2.setSize(list.width, list.height);
-		window2.hasMinimizeButton = true;
 		*/
 	}
 	
