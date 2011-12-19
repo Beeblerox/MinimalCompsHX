@@ -263,6 +263,12 @@ class PushButton extends Component
 	{
 		return _labelText;
 	}
+
+  public function setLabelFormat (format : Dynamic) : Void
+  {
+    _label.setFormat (format);
+    invalidate ();
+  }
 	
 	public function setSelected(value:Bool):Bool
 	{
