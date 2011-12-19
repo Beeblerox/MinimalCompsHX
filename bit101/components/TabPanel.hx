@@ -172,6 +172,10 @@ class TabPanel extends Component
 		return _tabs[index].panel;
 	}
 	
+  public function getTabButtonAt (index : Int) : PushButton
+  {
+    return _tabs[index].tab;
+  }
 	
 	public function setTabNameAt(name:String, index:Int):Void
 	{
