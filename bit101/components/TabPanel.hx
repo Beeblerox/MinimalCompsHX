@@ -214,7 +214,22 @@ class TabPanel extends Component
 				pb.selected = false;
 			}
 		}
+
+    dispatchEvent (new Event (Event.TAB_INDEX_CHANGE));
 	}
+
+  public function selected () : Int
+  {
+    for (i in 0..._tabs.length)
+    {
+      if (cast (_tabs[i].tab, PushButton).selected)
+      {
+        return i;
+      }
+    }
+
+    return -1;
+  }
 	
   public function getHeaderHeight () : Float
   {
