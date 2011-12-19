@@ -176,6 +176,12 @@ class Text extends Component
 	{
 		return _text;
 	}
+
+  public function addLine (l : String) : Void
+  {
+    _text = _text + l + "\n";
+    invalidate ();
+  }
 	
 	/**
 	 * Returns a reference to the internal text field in the component.
