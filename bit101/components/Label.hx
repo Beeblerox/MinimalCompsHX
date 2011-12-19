@@ -122,6 +122,40 @@ class Label extends Component
 	///////////////////////////////////
 	// public methods
 	///////////////////////////////////
+
+  public function setFormat (format : Dynamic) : TextFormat
+  {
+    var name = _tf.defaultTextFormat.font;
+    var size = _tf.defaultTextFormat.size;
+    var color = _tf.defaultTextFormat.color;
+    var align = _tf.defaultTextFormat.align;
+    var bold = _tf.defaultTextFormat.bold;
+
+    if (format.hasOwnProperty ("font"))
+    {
+      name = Reflect.field (format, "font");
+    }
+    if (format.hasOwnProperty ("size"))
+    {
+      size = Reflect.field (format, "size");
+    }
+    if (format.hasOwnProperty ("color"))
+    {
+      color = Reflect.field (format, "color");
+    }
+    if (format.hasOwnProperty ("align"))
+    {
+      align = Reflect.field (format, "align");
+    }
+    if (format.hasOwnProperty ("bold"))
+    {
+      bold = Reflect.field (format, "bold");
+    }
+      
+		var f:TextFormat = new TextFormat (name, size, color, bold, null, null, null, null, align);
+    _tf.defaultTextFormat = f;
+    return f;
+  }
 	
 	/**
 	 * Draws the visual ui of the component.
