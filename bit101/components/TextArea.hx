@@ -37,6 +37,7 @@ class TextArea extends Text
 	public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
 	
 	var _scrollbar:VScrollBar;
+  var _lineAppended : Bool;
 	
 	/**
 	 * Constructor
@@ -48,6 +49,7 @@ class TextArea extends Text
 	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?text:String = "")
 	{
 		super(parent, xpos, ypos, text);
+    _lineAppended = false;
 	}
 	
 	/**
@@ -97,6 +99,11 @@ class TextArea extends Text
 		_tf.width = _width - _scrollbar.width - 4;
 		_scrollbar.x = _width - _scrollbar.width;
 		_scrollbar.height = _height;
+    if (_lineAppended)
+    {
+      _scrollbar.goDown ();
+      _lineAppended = false;
+    }
 		_scrollbar.draw();
 		addEventListener(Event.ENTER_FRAME, onTextScrollDelay);
 	}
@@ -181,5 +188,13 @@ class TextArea extends Text
 	{
 		return _scrollbar.autoHide;
 	}
+
+  override function addLine (l : String) : Void
+  {
+    super.addLine (l);
+		_tf.scrollV = _tf.maxScrollV + 1;
+    _lineAppended = true;
+    invalidate ();
+  }
 
 }
