@@ -197,6 +197,12 @@ class Text extends Component
     _text = _text + l + "\n";
     invalidate ();
   }
+
+  public function clear () : Void
+  {
+    _text = "";
+    invalidate ();
+  }
 	
 	/**
 	 * Returns a reference to the internal text field in the component.
