@@ -192,6 +192,11 @@ class TextArea extends Text
   override function addLine (l : String) : Void
   {
     super.addLine (l);
+    goDown ();
+  }
+
+  public function goDown () : Void
+  {
 		_tf.scrollV = _tf.maxScrollV + 1;
     _lineAppended = true;
     invalidate ();
