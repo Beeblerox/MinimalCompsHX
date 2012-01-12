@@ -517,4 +517,13 @@ class Component implements IEventDispatcher
 		return val;
 	}
 
+  public function hide () : Void
+  {
+    _comp.visible = false;
+  }
+
+  public function show () : Void
+  {
+    _comp.visible = true;
+  }
 }
