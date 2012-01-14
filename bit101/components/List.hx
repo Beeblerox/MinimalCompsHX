@@ -135,22 +135,10 @@ class List extends Component
    */
   function makeListItems():Void
   {
-    // TODO: Fix this
-    var item:ListItem;
-    var displayItem:DisplayObject;
-    
     _listItems = [];
-    
-    /*while(_itemHolder.numChildren > 0)
-    {
-      // TODO: Fix this
-      item = cast(_itemHolder.getChildAt(0), ListItem);
-      item.removeEventListener(MouseEvent.CLICK, onSelect);
-      _itemHolder.removeChildAt(0);
-    }*/
     while (_itemHolder.numChildren > 0)
     {
-      displayItem = _itemHolder.getChildAt(0);
+      var displayItem : DisplayObject = _itemHolder.getChildAt(0);
       displayItem.removeEventListener(MouseEvent.CLICK, onSelect);
       _itemHolder.removeChildAt(0);
     }
@@ -160,7 +148,7 @@ class List extends Component
     numItems = Std.int(Math.max(cast(numItems, Float), 1));
     for (i in 0...numItems)
     {
-      item = Type.createInstance(_listItemClass, [_itemHolder, 0, i * _listItemHeight]);
+      var item : ListItem = new ListItem (_itemHolder, 0, i * _listItemHeight);
       item.setSize(width, _listItemHeight);
       item.defaultColor = _defaultColor;
 
@@ -184,10 +172,9 @@ class List extends Component
       _height = Std.int(Math.min(cast(numItemsToShow * _listItemHeight, Float), cast(numItems * _listItemHeight, Float)));
     }
     // TODO: Fix this
-    var item:ListItem;
     for (i in 0...numItems)
     {
-      item = cast(_listItems[i], ListItem);
+      var item : ListItem = _listItems[i];
       if (offset + i < _items.length)
       {
         item.data = _items[offset + i];
