@@ -19,7 +19,7 @@ class ListItemsModel implements IItemsModel
   {
     _data = data;
     _items = new Array ();
-    for (_ in data)
+    for (_ in 0...rowCount * columnCount)
     {
       _items.push (null);
     }
@@ -27,22 +27,23 @@ class ListItemsModel implements IItemsModel
 
   public function getRowCount () : Int
   {
-    return _items.length;
+    return _data.length;
   }
 
   public function getColumnCount () : Int
   {
-    return 1;
+    return 2;
   }
 
   public function data (row : Int, column : Int) : ListItem
   {
-    if (null == _items[row])
+    var index : Int = row * columnCount + column;
+    if (null == _items[index])
     {
-      _items[row] = new ListItem (null);
-      _items[row].data = _data[row];
+      _items[index] = new ListItem (null);
+      _items[index].data = _data[row];
     }
 
-    return _items[row];
+    return _items[index];
   }
 }

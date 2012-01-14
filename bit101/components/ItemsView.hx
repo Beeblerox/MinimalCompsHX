@@ -61,7 +61,6 @@ class ItemsView extends Component
 
   var _numItemsToShow:Int;
 
-  var _listItems:Array<ListItem>;
   var _model : IItemsModel;
 
   /**
@@ -85,7 +84,6 @@ class ItemsView extends Component
     
     _model = model;
     
-    _listItems = new Array<ListItem>();
     
     super(parent, xpos, ypos);
   }
@@ -128,45 +126,42 @@ class ItemsView extends Component
       _itemHolder.removeChildAt(0);
     }
 
-    _listItems = [];
-
     var offset:Int = Std.int(_scrollbar.value);
     var numItems:Int = Math.ceil(_height / _listItemHeight);
     numItems = Std.int(Math.min(cast(numItems, Float), cast(_model.rowCount, Float)));
     numItems = Std.int(Math.max(cast(numItems, Float), 1));
+    var w : Float = _width / _model.columnCount;
     for (i in 0...numItems)
     {
+      var xpos : Float = 0;
       if (offset + i < _model.rowCount)
       {
-        var item : ListItem = _model.data (offset + i, 0);
-        item.x = 0;
-        item.y = i * _listItemHeight;
-        _itemHolder.addChild (item.component);
-        item.setSize(width, _listItemHeight);
-        item.defaultColor = _defaultColor;
-
-        item.selectedColor = _selectedColor;
-        item.rolloverColor = _rolloverColor;
-        item.addEventListener(MouseEvent.CLICK, onSelect);
-
-        if(_alternateRows)
+        for (column in 0..._model.columnCount)
         {
-          item.defaultColor = ((offset + i) % 2 == 0) ? _defaultColor : _alternateColor;
-        }
-        else
-        {
+          var item : ListItem = _model.data (offset + i, column);
+          item.x = xpos;
+          item.y = i * _listItemHeight;
+
+          xpos += w + 2;
+
+          _itemHolder.addChild (item.component);
+          item.setSize(w, _listItemHeight);
           item.defaultColor = _defaultColor;
-        }
-        if(offset + i == _selectedIndex)
-        {
-          item.selected = true;
-        }
-        else
-        {
-          item.selected = false;
-        }
 
-        _listItems.push(item);
+          item.selectedColor = _selectedColor;
+          item.rolloverColor = _rolloverColor;
+          item.addEventListener(MouseEvent.CLICK, onSelect);
+
+          if(_alternateRows)
+          {
+            item.defaultColor = ((offset + i) % 2 == 0) ? _defaultColor : _alternateColor;
+          }
+          else
+          {
+            item.defaultColor = _defaultColor;
+          }
+          item.selected = offset + i == _selectedIndex;
+        }
       }
     }
   }
@@ -246,18 +241,19 @@ class ItemsView extends Component
    */
   function onSelect(event:Event):Void
   {
-    // TODO: Fix this
-    //if(!Std.is(event.target, ListItem)) return;
-    
-    var offset:Int = Std.int(_scrollbar.value);
-    
-    for (i in 0..._itemHolder.numChildren)
+    for (row in 0..._model.rowCount)
     {
-      if (_itemHolder.getChildAt(i) == event.target) _selectedIndex = i + offset;
-      //cast(_itemHolder.getChildAt(i), ListItem).selected = false;
-      cast(_listItems[i], ListItem).selected = false;
+      for (column in 0..._model.columnCount)
+      {
+        if (_model.data (row, column).component == event.target)
+        {
+          _selectedIndex = row;
+        }
+
+        _model.data (row, column).selected = false;
+      }
     }
-    //cast(event.target, ListItem).selected = true;
+
     selectedIndex = _selectedIndex;
     dispatchEvent(new Event(Event.SELECT));
   }
