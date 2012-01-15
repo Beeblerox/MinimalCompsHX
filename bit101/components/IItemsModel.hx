@@ -38,5 +38,8 @@ interface IItemsModel
   public function getRowCount () : Int;
   public function getColumnCount () : Int;
 
+  public function getItemWidth (column : Int, ?width : Float = 0) : Float;
+  public function getItemHeight () : Float;
+
   public function data (row : Int, column : Int) : ViewItem;
 }

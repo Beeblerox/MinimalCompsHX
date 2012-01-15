@@ -40,7 +40,7 @@ class ItemsView extends Component
   public var defaultColor(getDefaultColor, setDefaultColor):Int;
   public var selectedColor(getSelectedColor, setSelectedColor):Int;
   public var rolloverColor(getRolloverColor, setRolloverColor):Int;
-  public var listItemHeight(getListItemHeight, setListItemHeight):Float;
+  public var listItemHeight(getListItemHeight, null):Float;
   public var alternateColor(getAlternateColor, setAlternateColor):Int;
   public var alternateRows(getAlternateRows, setAlternateRows):Bool;
   public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
@@ -50,7 +50,6 @@ class ItemsView extends Component
 
   var _itemHolder:Sprite;
   var _panel:Panel;
-  var _listItemHeight:Float;
   var _scrollbar:VScrollBar;
   var _selectedIndex:Int;
   var _defaultColor:Int;
@@ -72,7 +71,6 @@ class ItemsView extends Component
    */
   public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?model:IItemsModel = null)
   {
-    _listItemHeight = 20;
     _selectedIndex = -1;
     _defaultColor = Style.LIST_DEFAULT;
     _alternateColor = Style.LIST_ALTERNATE;
@@ -127,10 +125,10 @@ class ItemsView extends Component
     }
 
     var offset:Int = Std.int(_scrollbar.value);
-    var numItems:Int = Math.ceil(_height / _listItemHeight);
+    var itemHeight : Float = _model.getItemHeight ();
+    var numItems:Int = Math.ceil(_height / itemHeight);
     numItems = Std.int(Math.min(cast(numItems, Float), cast(_model.rowCount, Float)));
     numItems = Std.int(Math.max(cast(numItems, Float), 1));
-    var w : Float = _width / _model.columnCount;
     for (i in 0...numItems)
     {
       var xpos : Float = 0;
@@ -138,14 +136,15 @@ class ItemsView extends Component
       {
         for (column in 0..._model.columnCount)
         {
+          var w : Float = _model.getItemWidth (column, _width);
           var item : ViewItem = _model.data (offset + i, column);
           item.x = xpos;
-          item.y = i * _listItemHeight;
+          item.y = i * itemHeight;
 
           xpos += w + 2;
 
           _itemHolder.addChild (item.component);
-          item.setSize(w, _listItemHeight);
+          item.setSize(w, itemHeight);
           item.defaultColor = _defaultColor;
 
           item.selectedColor = _selectedColor;
@@ -171,7 +170,7 @@ class ItemsView extends Component
    */
   public function scrollToSelection():Void
   {
-    var numItems:Int = Math.ceil(_height / _listItemHeight);
+    var numItems:Int = Math.ceil(_height / _model.getItemHeight ());
     if(_selectedIndex != -1)
     {
       if(_scrollbar.value > _selectedIndex)
@@ -212,12 +211,12 @@ class ItemsView extends Component
     
     // scrollbar
     _scrollbar.x = _width - 10;
-    var contentHeight:Float = _model.rowCount * _listItemHeight;
+    var contentHeight:Float = _model.rowCount * _model.getItemHeight ();
     _scrollbar.setThumbPercent(_height / contentHeight); 
     #if flash
-    var pageSize:Float = Math.floor(_height / _listItemHeight);
+    var pageSize:Float = Math.floor(_height / _model.getItemHeight ());
     #else
-    var pageSize:Float = Math.ceil(_height / _listItemHeight);
+    var pageSize:Float = Math.ceil(_height / _model.getItemHeight ());
     #end
     _scrollbar.maximum = Math.max(0, _model.rowCount - pageSize);
     _scrollbar.pageSize = Std.int(pageSize);
@@ -398,19 +397,12 @@ class ItemsView extends Component
   }
 
   /**
-   * Sets the height of each list item.
+   * Gets the height of each list item.
    */
-  public function setListItemHeight(value:Float):Float
-  {
-    _listItemHeight = value;
-    makeListItems();
-    invalidate();
-    return value;
-  }
   
   public function getListItemHeight():Float
   {
-    return _listItemHeight;
+    return _model.getItemHeight ();
   }
 
   /**
@@ -480,7 +472,7 @@ class ItemsView extends Component
     if (value > 0)
     {
       _numItemsToShow = value;
-      height = _numItemsToShow * _listItemHeight;
+      height = _numItemsToShow * _model.getItemHeight ();
       //draw();
     }
     return value;
@@ -493,7 +485,7 @@ class ItemsView extends Component
   
   override public function setHeight(h:Float):Float
   {
-    _numItemsToShow = Math.ceil(h / _listItemHeight);
+    _numItemsToShow = Math.ceil(h / _model.getItemHeight ());
     return super.setHeight(h);
   }
 

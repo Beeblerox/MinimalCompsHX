@@ -35,6 +35,16 @@ class ListItemsModel implements IItemsModel
     return 1;
   }
 
+  public function getItemWidth (column : Int, ?width : Float = 0) : Float
+  {
+    return width / columnCount;
+  }
+
+  public function getItemHeight () : Float
+  {
+    return 20;
+  }
+
   public function data (row : Int, column : Int) : ViewItem
   {
     var index : Int = row * columnCount + column;
