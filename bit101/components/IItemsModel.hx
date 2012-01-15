@@ -38,5 +38,5 @@ interface IItemsModel
   public function getRowCount () : Int;
   public function getColumnCount () : Int;
 
-  public function data (row : Int, column : Int) : ListItem;
+  public function data (row : Int, column : Int) : ViewItem;
 }

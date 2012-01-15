@@ -138,7 +138,7 @@ class ItemsView extends Component
       {
         for (column in 0..._model.columnCount)
         {
-          var item : ListItem = _model.data (offset + i, column);
+          var item : ViewItem = _model.data (offset + i, column);
           item.x = xpos;
           item.y = i * _listItemHeight;
 
