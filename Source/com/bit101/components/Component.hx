@@ -70,6 +70,7 @@ class Component implements IEventDispatcher
 	public var visible(getVisible, setVisible):Bool;
 	public var graphics(getGraphics, null):Graphics;
 	public var parent(default, null):Dynamic;
+  public var component (getComponent, null) : Sprite;
 	public var alpha(getAlpha, setAlpha):Float;
 	
 	public var tag(getTag, setTag):Int;
@@ -517,4 +518,18 @@ class Component implements IEventDispatcher
 		return val;
 	}
 
+  public function hide () : Void
+  {
+    _comp.visible = false;
+  }
+
+  public function show () : Void
+  {
+    _comp.visible = true;
+  }
+
+  public function getComponent () : Sprite
+  {
+    return _comp;
+  }
 }

@@ -35,8 +35,11 @@ class TextArea extends Text
 {
 	
 	public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
+  public var linesCount (getLinesCount, null) : Int;
 	
 	var _scrollbar:VScrollBar;
+  var _lineAppended : Bool;
+  var _linesCount : Int;
 	
 	/**
 	 * Constructor
@@ -48,6 +51,8 @@ class TextArea extends Text
 	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?text:String = "")
 	{
 		super(parent, xpos, ypos, text);
+    _lineAppended = false;
+    _linesCount = 0;
 	}
 	
 	/**
@@ -97,6 +102,11 @@ class TextArea extends Text
 		_tf.width = _width - _scrollbar.width - 4;
 		_scrollbar.x = _width - _scrollbar.width;
 		_scrollbar.height = _height;
+    if (_lineAppended)
+    {
+      _scrollbar.goDown ();
+      _lineAppended = false;
+    }
 		_scrollbar.draw();
 		addEventListener(Event.ENTER_FRAME, onTextScrollDelay);
 	}
@@ -182,4 +192,32 @@ class TextArea extends Text
 		return _scrollbar.autoHide;
 	}
 
+  override function addLine (l : String) : Void
+  {
+    super.addLine (l);
+    goDown ();
+    _linesCount += 1;
+  }
+
+  public function goDown () : Void
+  {
+		_tf.scrollV = _tf.maxScrollV + 1;
+    _lineAppended = true;
+    invalidate ();
+  }
+
+  public function shiftLines (lines : Int) : Void
+  {
+    var l : Array <String> = _text.split ("\n");
+    _text = l.slice (lines).join ("\n");
+    goDown ();
+    _linesCount -= lines;
+  }
+
+  public function getLinesCount () : Int
+  {
+    return _linesCount;
+  }
+
 }
+
