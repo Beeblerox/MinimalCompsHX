@@ -32,6 +32,7 @@ import flash.events.Event;
 import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
+import flash.text.StyleSheet;
 
 class Text extends Component
 {
@@ -48,6 +49,7 @@ class Text extends Component
 	var _selectable:Bool;
 	var _html:Bool;
 	var _format:TextFormat;
+  var _styleSheet : StyleSheet;
 	
 	/**
 	 * Constructor
@@ -56,12 +58,12 @@ class Text extends Component
 	 * @param ypos The y position to place this component.
 	 * @param text The initial text to display in this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "")
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "", ?h : Bool = false)
 	{
 		_text = "";
 		_editable = true;
 		_selectable = true;
-		_html = false;
+		_html = h;
 		_text = text;
 		super(parent, xpos, ypos);
 		setSize(200, 100);
@@ -84,6 +86,7 @@ class Text extends Component
 		_panel.color = Style.TEXT_BACKGROUND;
 		
 		_format = new TextFormat(Style.fontName, Style.fontSize, Style.LABEL_TEXT);
+    _styleSheet = new StyleSheet ();
 		
 		_tf = new TextField();
 		_tf.x = 2;
@@ -96,8 +99,17 @@ class Text extends Component
 		_tf.wordWrap = true;
 		_tf.selectable = true;
 		_tf.type = TextFieldType.INPUT;
-		_tf.defaultTextFormat = _format;
+    if (_html)
+    {
+      _tf.styleSheet = _styleSheet;
+    }
+    else
+    {
+		  _tf.defaultTextFormat = _format;
+    }
+
 		_tf.addEventListener(Event.CHANGE, onChange);			
+
 		addChild(_tf);
 	}
 	
@@ -140,7 +152,10 @@ class Text extends Component
 			_tf.selectable = _selectable;
 			_tf.type = TextFieldType.DYNAMIC;
 		}
-		_tf.setTextFormat(_format);
+    if (!_html)
+    {
+		  _tf.setTextFormat(_format);
+    }
 	}
 	
 	
@@ -176,6 +191,18 @@ class Text extends Component
 	{
 		return _text;
 	}
+
+  public function addLine (l : String) : Void
+  {
+    _text = _text + l + "\n";
+    invalidate ();
+  }
+
+  public function clear () : Void
+  {
+    _text = "";
+    invalidate ();
+  }
 	
 	/**
 	 * Returns a reference to the internal text field in the component.
@@ -220,6 +247,7 @@ class Text extends Component
 	public function setHtml(b:Bool):Bool
 	{
 		_html = b;
+    _tf.styleSheet = b ? _styleSheet : null;
 		invalidate();
 		return b;
 	}

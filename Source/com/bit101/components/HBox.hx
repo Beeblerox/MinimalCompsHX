@@ -40,11 +40,14 @@ class HBox extends Component
 	
 	var _spacing:Float;
 	private var _alignment:String;
+  private var _hAlignment : String;
 	
 	public static inline var TOP:String = "top";
 	public static inline var BOTTOM:String = "bottom";
 	public static inline var MIDDLE:String = "middle";
-	public static inline var NONE:String = "none";
+
+  public static inline var LEFT : String = "left";
+  public static inline var RIGHT : String = "right";
 	
 	
 	/**
@@ -56,7 +59,8 @@ class HBox extends Component
 	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0)
 	{
 		_spacing = 5;
-		_alignment = NONE;
+		_alignment = TOP;
+    _hAlignment = LEFT;
 		
 		super(parent, xpos, ypos);
 	}
@@ -110,52 +114,96 @@ class HBox extends Component
 		invalidate();
 	}
 	
-	function doAlignment():Void
-	{
-		if(_alignment != NONE)
-		{
-			for(i in 0...numChildren)
-			{
-				var child:DisplayObject = getChildAt(i);
-				if(_alignment == TOP)
-				{
-					child.y = 0;
-				}
-				else if(_alignment == BOTTOM)
-				{
-					child.y = _height - child.height;
-				}
-				else if(_alignment == MIDDLE)
-				{
-					child.y = (_height - child.height) / 2;
-				}
-			}
-		}
-	}
-	
+  function doAlignment():Void
+  {
+    var xpos : Float = 0;
+    for(i in 0...numChildren)
+    {
+      var child:DisplayObject = getChildAt(i);
+      if(_alignment == TOP)
+      {
+        child.y = 0;
+      }
+      else if(_alignment == BOTTOM)
+      {
+        child.y = _height - child.height;
+      }
+      else if(_alignment == MIDDLE)
+      {
+        child.y = (_height - child.height) / 2;
+      }
+    }
+
+    if (_hAlignment == LEFT)
+    {
+      var xpos : Float = 0;
+      for (i in 0...numChildren)
+      {
+        var child:DisplayObject = getChildAt(i);
+        if (child.visible)
+        {
+          child.x = xpos;
+          xpos += child.width + _spacing;
+        }
+      }
+    }
+    else if (_hAlignment == RIGHT)
+    {
+      var xpos : Float = 0;
+      for (i in 0...numChildren)
+      {
+        var child:DisplayObject = getChildAt(numChildren - i - 1);
+        if (child.visible)
+        {
+          child.x = _width - xpos - child.width;
+          xpos += child.width + _spacing;
+        }
+      }
+    }
+  }
+
 	/**
 	 * Draws the visual ui of the component, in this case, laying out the sub components.
 	 */
 	override public function draw():Void
 	{
-		_width = 0;
-		_height = 0;
-		var xpos:Float = 0;
-		for (i in 0...numChildren)
-		{
-			var child:DisplayObject = getChildAt(i);
-			if (!child.visible) continue;
-			child.x = xpos;
-			xpos += child.width;
-			xpos += _spacing;
-			_width += child.width;
-			_height = Math.max(_height, child.height);
-		}
-		doAlignment();
-		_width += _spacing * (numChildren - 1);
-		dispatchEvent(new Event(Event.RESIZE));
-	}
-	
+    if (_height == 0)
+    {
+      _height = _calculateHeight ();
+    }
+    if (_width == 0)
+    {
+      _width = _calculateWidth ();
+    }
+
+    doAlignment ();
+    dispatchEvent(new Event(Event.RESIZE));
+  }
+
+  function _calculateHeight () : Float
+  {
+    var h : Float = 0;
+    for (i in 0...numChildren)
+    {
+      var child : DisplayObject = getChildAt (i);
+      h = Math.max (h, child.height);
+    }
+
+    return h;
+  }
+
+  function _calculateWidth () : Float
+  {
+    var w : Float = 0;
+    for (i in 0...numChildren)
+    {
+      var child : DisplayObject = getChildAt (i);
+      w += child.width + _spacing;
+    }
+
+    return w;
+  }
+
 	/**
 	 * Gets / sets the spacing between each sub component.
 	 */
@@ -185,6 +233,13 @@ class HBox extends Component
 	{
 		return _alignment;
 	}
+
+  public function setHorizontalAlignment (value : String) : String
+  {
+    _hAlignment = value;
+    invalidate ();
+    return value;
+  }
 	
 	override public function setVisible(value:Bool):Bool 
 	{

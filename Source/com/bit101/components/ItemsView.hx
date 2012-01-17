@@ -33,28 +33,23 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
-class List extends Component
+class ItemsView extends Component
 {
   public var selectedIndex(getSelectedIndex, setSelectedIndex):Int;
   public var selectedItem(getSelectedItem, setSelectedItem):Dynamic;
   public var defaultColor(getDefaultColor, setDefaultColor):Int;
   public var selectedColor(getSelectedColor, setSelectedColor):Int;
   public var rolloverColor(getRolloverColor, setRolloverColor):Int;
-  public var listItemHeight(getListItemHeight, setListItemHeight):Float;
-  public var items(getItems, setItems):Array<Dynamic>;
-  public var listItemClass(getListItemClass, setListItemClass):Class<ListItem>;
+  public var listItemHeight(getListItemHeight, null):Float;
   public var alternateColor(getAlternateColor, setAlternateColor):Int;
   public var alternateRows(getAlternateRows, setAlternateRows):Bool;
   public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
-  
+  public var model (getModel, setModel) : IItemsModel;
+
   public var numItemsToShow(getNumItemsToShow, setNumItemsToShow):Int;
-  public var autoHeight(getAutoHeight, setAutoHeight):Bool;
-  
-  var _items:Array<Dynamic>;
+
   var _itemHolder:Sprite;
   var _panel:Panel;
-  var _listItemHeight:Float;
-  var _listItemClass:Class<ListItem>;
   var _scrollbar:VScrollBar;
   var _selectedIndex:Int;
   var _defaultColor:Int;
@@ -62,12 +57,11 @@ class List extends Component
   var _selectedColor:Int;
   var _rolloverColor:Int;
   var _alternateRows:Bool;
-  
+
   var _numItemsToShow:Int;
-  var _autoHeight:Bool;
-  
-  var _listItems:Array<ListItem>;
-  
+
+  var _model : IItemsModel;
+
   /**
    * Constructor
    * @param parent The parent DisplayObjectContainer on which to add this List.
@@ -75,10 +69,8 @@ class List extends Component
    * @param ypos The y position to place this component.
    * @param items An array of items to display in the list. Either strings or objects with label property.
    */
-  public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?items:Array<Dynamic> = null)
+  public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?model:IItemsModel = null)
   {
-    _listItemHeight = 20;
-    _listItemClass = ListItem;
     _selectedIndex = -1;
     _defaultColor = Style.LIST_DEFAULT;
     _alternateColor = Style.LIST_ALTERNATE;
@@ -87,18 +79,9 @@ class List extends Component
     _alternateRows = false;
     
     _numItemsToShow = 5;
-    _autoHeight = false;
     
-    if(items != null)
-    {
-      _items = items;
-    }
-    else
-    {
-      _items = new Array();
-    }
+    _model = model;
     
-    _listItems = new Array<ListItem>();
     
     super(parent, xpos, ypos);
   }
@@ -113,7 +96,6 @@ class List extends Component
     addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
     addEventListener(Event.RESIZE, onResize);
     makeListItems();
-    fillItems();
   }
   
   /**
@@ -135,7 +117,6 @@ class List extends Component
    */
   function makeListItems():Void
   {
-    _listItems = [];
     while (_itemHolder.numChildren > 0)
     {
       var displayItem : DisplayObject = _itemHolder.getChildAt(0);
@@ -143,71 +124,53 @@ class List extends Component
       _itemHolder.removeChildAt(0);
     }
 
-    var numItems:Int = Math.ceil(_height / _listItemHeight);
-    numItems = Std.int(Math.min(cast(numItems, Float), cast(_items.length, Float)));
+    var offset:Int = Std.int(_scrollbar.value);
+    var itemHeight : Float = _model.getItemHeight ();
+    var numItems:Int = Math.ceil(_height / itemHeight);
+    numItems = Std.int(Math.min(cast(numItems, Float), cast(_model.rowCount, Float)));
     numItems = Std.int(Math.max(cast(numItems, Float), 1));
     for (i in 0...numItems)
     {
-      var item : ListItem = new ListItem (_itemHolder, 0, i * _listItemHeight);
-      item.setSize(width, _listItemHeight);
-      item.defaultColor = _defaultColor;
+      var xpos : Float = 0;
+      if (offset + i < _model.rowCount)
+      {
+        for (column in 0..._model.columnCount)
+        {
+          var w : Float = _model.getItemWidth (column, _width);
+          var item : ViewItem = _model.data (offset + i, column);
+          item.x = xpos;
+          item.y = i * itemHeight;
 
-      item.selectedColor = _selectedColor;
-      item.rolloverColor = _rolloverColor;
-      item.addEventListener(MouseEvent.CLICK, onSelect);
-      
-      _listItems.push(item);
+          xpos += w + 2;
+
+          _itemHolder.addChild (item.component);
+          item.setSize(w, itemHeight);
+          item.defaultColor = _defaultColor;
+
+          item.selectedColor = _selectedColor;
+          item.rolloverColor = _rolloverColor;
+          item.addEventListener(MouseEvent.CLICK, onSelect);
+
+          if(_alternateRows)
+          {
+            item.defaultColor = ((offset + i) % 2 == 0) ? _defaultColor : _alternateColor;
+          }
+          else
+          {
+            item.defaultColor = _defaultColor;
+          }
+          item.selected = offset + i == _selectedIndex;
+        }
+      }
     }
   }
 
-  function fillItems():Void
-  {
-    var offset:Int = Std.int(_scrollbar.value);
-    var numItems:Int = Math.ceil(_height / _listItemHeight);
-    numItems = Std.int(Math.min(cast(numItems, Float), cast(_items.length, Float)));
-    
-    // TODO: Fix this
-    if (_autoHeight)
-    {
-      _height = Std.int(Math.min(cast(numItemsToShow * _listItemHeight, Float), cast(numItems * _listItemHeight, Float)));
-    }
-    // TODO: Fix this
-    for (i in 0...numItems)
-    {
-      var item : ListItem = _listItems[i];
-      if (offset + i < _items.length)
-      {
-        item.data = _items[offset + i];
-      }
-      else
-      {
-        item.data = "";
-      }
-      if(_alternateRows)
-      {
-        item.defaultColor = ((offset + i) % 2 == 0) ? _defaultColor : _alternateColor;
-      }
-      else
-      {
-        item.defaultColor = _defaultColor;
-      }
-      if(offset + i == _selectedIndex)
-      {
-        item.selected = true;
-      }
-      else
-      {
-        item.selected = false;
-      }
-    }
-  }
-  
   /**
    * If the selected item is not in view, scrolls the list to make the selected item appear in the view.
    */
   public function scrollToSelection():Void
   {
-    var numItems:Int = Math.ceil(_height / _listItemHeight);
+    var numItems:Int = Math.ceil(_height / _model.getItemHeight ());
     if(_selectedIndex != -1)
     {
       if(_scrollbar.value > _selectedIndex)
@@ -223,7 +186,7 @@ class List extends Component
     {
       _scrollbar.value = 0;
     }
-    fillItems();
+    makeListItems();
   }
   
   
@@ -239,7 +202,7 @@ class List extends Component
   {
     super.draw();
     
-    _selectedIndex = Std.int(Math.min(cast(_selectedIndex, Float), cast(_items.length - 1, Float)));
+    _selectedIndex = Std.int(Math.min(cast(_selectedIndex, Float), cast(_model.rowCount - 1, Float)));
 
     // panel
     _panel.setSize(_width, _height);
@@ -248,14 +211,14 @@ class List extends Component
     
     // scrollbar
     _scrollbar.x = _width - 10;
-    var contentHeight:Float = _items.length * _listItemHeight;
+    var contentHeight:Float = _model.rowCount * _model.getItemHeight ();
     _scrollbar.setThumbPercent(_height / contentHeight); 
     #if flash
-    var pageSize:Float = Math.floor(_height / _listItemHeight);
+    var pageSize:Float = Math.floor(_height / _model.getItemHeight ());
     #else
-    var pageSize:Float = Math.ceil(_height / _listItemHeight);
+    var pageSize:Float = Math.ceil(_height / _model.getItemHeight ());
     #end
-    _scrollbar.maximum = Math.max(0, _items.length - pageSize);
+    _scrollbar.maximum = Math.max(0, _model.rowCount - pageSize);
     _scrollbar.pageSize = Std.int(pageSize);
     _scrollbar.height = _height;
     _scrollbar.draw();
@@ -268,80 +231,6 @@ class List extends Component
     #end
   }
   
-  /**
-   * Adds an item to the list.
-   * @param item The item to add. Can be a string or an object containing a string property named label.
-   */
-  public function addItem(item:Dynamic):Void
-  {
-    _items.push(item);
-    invalidate();
-    makeListItems();
-    fillItems();
-  }
-  
-  /**
-   * Adds an item to the list at the specified index.
-   * @param item The item to add. Can be a string or an object containing a string property named label.
-   * @param index The index at which to add the item.
-   */
-  public function addItemAt(item:Dynamic, index:Int):Void
-  {
-    index = Std.int(Math.max(0, cast(index, Float)));
-    index = Std.int(Math.min(cast(_items.length, Float), cast(index, Float)));
-    //_items.splice(index, 0, item);
-    _items.insert(index, item);
-    invalidate();
-    makeListItems();
-    fillItems();
-  }
-  
-  /**
-   * Removes the referenced item from the list.
-   * @param item The item to remove. If a string, must match the item containing that string. If an object, must be a reference to the exact same object.
-   */
-  public function removeItem(item:Dynamic):Void
-  {
-    //var index:Int = _items.indexOf(item);
-    for (i in 0..._items.length)
-    {
-      if (item == _items[i])
-      {
-        removeItemAt(i);
-        break;
-      }
-    }
-    //removeItemAt(index);
-  }
-  
-  /**
-   * Removes the item from the list at the specified index
-   * @param index The index of the item to remove.
-   */
-  public function removeItemAt(index:Int):Void
-  {
-    if (index < 0 || index >= _items.length) return;
-    _items.splice(index, 1);
-    invalidate();
-    makeListItems();
-    fillItems();
-  }
-  
-  /**
-   * Removes all items from the list.
-   */
-  public function removeAll():Void
-  {
-    _items = [];
-    invalidate();
-    makeListItems();
-    fillItems();
-  }
-  
-  
-  
-  
-  
   ///////////////////////////////////
   // event handlers
   ///////////////////////////////////
@@ -351,18 +240,19 @@ class List extends Component
    */
   function onSelect(event:Event):Void
   {
-    // TODO: Fix this
-    //if(!Std.is(event.target, ListItem)) return;
-    
-    var offset:Int = Std.int(_scrollbar.value);
-    
-    for (i in 0..._itemHolder.numChildren)
+    for (row in 0..._model.rowCount)
     {
-      if (_itemHolder.getChildAt(i) == event.target) _selectedIndex = i + offset;
-      //cast(_itemHolder.getChildAt(i), ListItem).selected = false;
-      cast(_listItems[i], ListItem).selected = false;
+      for (column in 0..._model.columnCount)
+      {
+        if (_model.data (row, column).component == event.target)
+        {
+          _selectedIndex = row;
+        }
+
+        _model.data (row, column).selected = false;
+      }
     }
-    //cast(event.target, ListItem).selected = true;
+
     selectedIndex = _selectedIndex;
     dispatchEvent(new Event(Event.SELECT));
   }
@@ -372,7 +262,7 @@ class List extends Component
    */
   function onScroll(event:Event):Void
   {
-    fillItems();
+    makeListItems ();
   }
   
   /**
@@ -385,13 +275,12 @@ class List extends Component
     #else
     _scrollbar.value += event.delta;
     #end
-    fillItems();
+    onScroll (null);
   }
 
   function onResize(event:Event):Void
   {
     makeListItems();
-    fillItems();
   }
   ///////////////////////////////////
   // getter/setters
@@ -402,7 +291,7 @@ class List extends Component
    */
   public function setSelectedIndex(value:Int):Int
   {
-    if (value >= 0 && value < _items.length)
+    if (value >= 0 && value < _model.rowCount)
     {
       _selectedIndex = value;
 //        _scrollbar.value = _selectedIndex;
@@ -427,9 +316,9 @@ class List extends Component
   public function setSelectedItem(item:Dynamic):Dynamic
   {
     var index:Int = -1; //_items.indexOf(item);
-    for (i in 0..._items.length)
+    for (i in 0..._model.rowCount)
     {
-      if (item == _items[i])
+      if (item == _model.data (i, 0))
       {
         index = i;
         break;
@@ -446,9 +335,9 @@ class List extends Component
   
   public function getSelectedItem():Dynamic
   {
-    if(_selectedIndex >= 0 && _selectedIndex < _items.length)
+    if(_selectedIndex >= 0 && _selectedIndex < _model.rowCount)
     {
-      return _items[_selectedIndex];
+      return _model.data (_selectedIndex, 0);
     }
     return null;
   }
@@ -508,50 +397,27 @@ class List extends Component
   }
 
   /**
-   * Sets the height of each list item.
+   * Gets the height of each list item.
    */
-  public function setListItemHeight(value:Float):Float
-  {
-    _listItemHeight = value;
-    makeListItems();
-    invalidate();
-    return value;
-  }
   
   public function getListItemHeight():Float
   {
-    return _listItemHeight;
+    return _model.getItemHeight ();
   }
 
   /**
-   * Sets / gets the list of items to be shown.
+   * Sets / gets the model.
    */
-  public function setItems(value:Array<Dynamic>):Array<Dynamic>
+  public function setModel (value : IItemsModel) : IItemsModel
   {
-    _items = value;
+    _model = value;
     invalidate();
     return value;
   }
   
-  public function getItems():Array<Dynamic>
+  public function getModel () : IItemsModel
   {
-    return _items;
-  }
-
-  /**
-   * Sets / gets the class used to render list items. Must extend ListItem.
-   */
-  public function setListItemClass(value:Class<ListItem>):Class<ListItem>
-  {
-    _listItemClass = value;
-    makeListItems();
-    invalidate();
-    return value;
-  }
-  
-  public function getListItemClass():Class<ListItem>
-  {
-    return _listItemClass;
+    return _model;
   }
 
   /**
@@ -606,7 +472,7 @@ class List extends Component
     if (value > 0)
     {
       _numItemsToShow = value;
-      height = _numItemsToShow * _listItemHeight;
+      height = _numItemsToShow * _model.getItemHeight ();
       //draw();
     }
     return value;
@@ -617,23 +483,10 @@ class List extends Component
     return _numItemsToShow;
   }
   
-  public function getAutoHeight():Bool
-  {
-    return _autoHeight;
-  }
-  
-  public function setAutoHeight(value:Bool):Bool
-  {
-    _autoHeight = value;
-    fillItems();
-    return value;
-  }
-  
   override public function setHeight(h:Float):Float
   {
-    _numItemsToShow = Math.ceil(h / _listItemHeight);
+    _numItemsToShow = Math.ceil(h / _model.getItemHeight ());
     return super.setHeight(h);
   }
 
 }
-

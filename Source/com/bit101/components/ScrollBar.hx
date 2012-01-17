@@ -340,7 +340,7 @@ class ScrollBar extends Component
 		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
-	function goDown():Void
+	public function goDown():Void
 	{
 		_scrollSlider.value += _lineSize;
 		dispatchEvent(new Event(Event.CHANGE));

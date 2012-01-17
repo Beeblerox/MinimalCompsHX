@@ -36,6 +36,7 @@ class TabPanel extends Component
 {
 	var _tabs:Array<Dynamic>;
 	var _hbox:HBox;
+  var TABS : Int;
 	
 	
 	/**
@@ -44,8 +45,9 @@ class TabPanel extends Component
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?tabs = 2)
 	{
+    TABS = tabs;
 		super(parent, xpos, ypos);
 	}
 	
@@ -64,7 +66,6 @@ class TabPanel extends Component
 	 */
 	override function addChildren():Void
 	{
-		var TABS:Int = 2;
 		var tab:PushButton;
 		var panel:Panel;
 		
@@ -78,14 +79,17 @@ class TabPanel extends Component
 			tab = new PushButton(_hbox, 0,0, "Tab " + i, tabSelected);
 			tab.toggle = true;
 			
-			panel = new Panel(this, 0, tab.height);
+			panel = new Panel(this, 0, tab.height - 1);
 			panel.visible = false;
 			
 			_tabs.push({tab:tab, panel:panel});
 		}
 		
-		cast(_tabs[0].tab, PushButton).selected = true;
-		cast(_tabs[0].panel, Panel).visible = true;
+    if (_tabs.length > 0)
+    {
+      cast(_tabs[0].tab, PushButton).selected = true;
+      cast(_tabs[0].panel, Panel).visible = true;
+    }
 	}
 	
 	///////////////////////////////////
@@ -96,13 +100,14 @@ class TabPanel extends Component
 	 * Adds a new window to the bottom of the accordion.
 	 * @param title The title of the new tab.
 	 */
-	public function addTab(title:String):Void
+	public function addTab(title:String):Int
 	{
-		addTabAt(title, _tabs.length);
+		return addTabAt(title, _tabs.length);
 	}
 	
-	public function addTabAt(title:String, index:Int):Void
+	public function addTabAt(title:String, index:Int):Int
 	{
+    var isNew : Bool = _tabs.length == 0;
 		
 		var pb:PushButton;
 		var p:Panel;
@@ -114,26 +119,47 @@ class TabPanel extends Component
 		pb.toggle = true;
 		pb.selected = false;
 		
-		p = new Panel(this, 0, pb.height);
+		p = new Panel(this, 0, pb.height - 1);
 		p.visible = false;
 		
 		_hbox.addChildAt(pb, index);
 		
 		_tabs.insert(index, {tab:pb, panel:p});
 
+    if (isNew)
+    {
+      cast(_tabs[0].tab, PushButton).selected = true;
+      cast(_tabs[0].panel, Panel).visible = true;
+    }
+
+    _resize ();
 		invalidate();
+    return index;
 	}
+
+  private function _resize () : Void
+  {
+		var tabW:Float = Math.round(width / _tabs.length);
+		var tabH:Float = cast(_tabs[0].tab, PushButton).height;
+
+		for (i in 0..._tabs.length)
+		{
+			cast (_tabs[i].tab, PushButton).width = tabW;
+			cast (_tabs[i].panel, Panel).setSize(width, height - tabH);
+		}
+  }
 	
 	
 	override public function draw():Void
 	{
-		var tabW:Float = Math.round(width / _tabs.length);
-		var tabH:Float = cast(_tabs[0].tab, PushButton).height;
-		for (i in 0..._tabs.length)
-		{
-			_tabs[i].tab.width = tabW;
-			_tabs[i].panel.setSize(width, height - tabH);
-		}
+    _hbox.setY (height - _hbox.height);
+    for (i in 0..._tabs.length)
+    {
+      _tabs[i].panel.setY (0);
+    }
+
+    _resize ();
+
 		_hbox.draw();
 	}
 	
@@ -146,11 +172,15 @@ class TabPanel extends Component
 		return _tabs[index].panel;
 	}
 	
+  public function getTabButtonAt (index : Int) : PushButton
+  {
+    return _tabs[index].tab;
+  }
 	
 	public function setTabNameAt(name:String, index:Int):Void
 	{
 		if (index >= _tabs.length) return;
-		_tabs[index].tab.label = name;
+		cast (_tabs[index].tab, PushButton).label = name;
 		invalidate();
 	}
 		
@@ -184,7 +214,32 @@ class TabPanel extends Component
 				pb.selected = false;
 			}
 		}
+
+    dispatchEvent (new Event (Event.TAB_INDEX_CHANGE));
 	}
+
+  public function selected () : Int
+  {
+    for (i in 0..._tabs.length)
+    {
+      if (cast (_tabs[i].tab, PushButton).selected)
+      {
+        return i;
+      }
+    }
+
+    return -1;
+  }
 	
+  public function getHeaderHeight () : Float
+  {
+    return _hbox.height;
+  }
+
+  public function getPanelHeight () : Float
+  {
+    return getHeight () - getHeaderHeight ();
+  }
 	
 }
+

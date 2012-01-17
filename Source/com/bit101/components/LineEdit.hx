@@ -1,11 +1,11 @@
 /**
-* ListItem.as
-* Keith Peters
+* LineEdit.hx
+* Sergey Miryanov
 * version 0.9.10
 * 
-* A single item in a list. 
+* A Text component for editing one line of text.
 * 
-* Copyright (c) 2011 Keith Peters
+* Copyright (c) 2011 Sergey Miryanov
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,61 +26,29 @@
 * THE SOFTWARE.
 */
 
-
 package com.bit101.components;
 
+import flash.events.Event;
+import flash.text.TextField;
+import flash.text.TextFieldType;
+import flash.text.TextFormat;
 
-class ListItem extends ViewItem
+class LineEdit extends Text
 {
-	var _label:Label;
-	
 	/**
 	 * Constructor
-	 * @param parent The parent DisplayObjectContainer on which to add this ListItem.
+	 * @param parent The parent DisplayObjectContainer on which to add this Label.
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
-	 * @param data The string to display as a label or object with a label property.
+	 * @param text The initial text to display in this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?data:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "")
 	{
-		super(parent, xpos, ypos, data);
-	}
-	
-	
-	/**
-	 * Creates and adds the child display objects of this component.
-	 */
-	override function addChildren():Void
-	{
-		super.addChildren();
-		_label = new Label(this, 5, 0);
-		_label.draw();
-	}
-	
-	///////////////////////////////////
-	// public methods
-	///////////////////////////////////
-	
-	/**
-	 * Draws the data.
-	 */
-	public override function drawData () : Void
-	{
-    super.drawData ();
+		super(parent, xpos, ypos, text);
+    _tf.multiline = false;
+    _tf.wordWrap = false;
 
-		if(Std.is(_data, String))
-		{
-			_label.text = Std.string(_data);
-		}
-		else if(Reflect.hasField(_data, "label") && Std.is(Reflect.field(_data, "label"), String))
-		{
-			_label.text = Reflect.field(_data, "label");// _data.label;
-		}
-		else
-		{
-			_label.text = Std.string(_data);
-		}
+    setSize (200, _tf.getLineMetrics (0).height * 1.6);
 	}
-	
 }
 
