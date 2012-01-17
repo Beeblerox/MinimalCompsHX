@@ -32,7 +32,9 @@ import flash.events.Event;
 import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
+#if flash
 import flash.text.StyleSheet;
+#end
 
 class Text extends Component
 {
@@ -49,7 +51,9 @@ class Text extends Component
 	var _selectable:Bool;
 	var _html:Bool;
 	var _format:TextFormat;
-  var _styleSheet : StyleSheet;
+	#if flash
+	var _styleSheet : StyleSheet;
+	#end
 	
 	/**
 	 * Constructor
@@ -86,7 +90,9 @@ class Text extends Component
 		_panel.color = Style.TEXT_BACKGROUND;
 		
 		_format = new TextFormat(Style.fontName, Style.fontSize, Style.LABEL_TEXT);
-    _styleSheet = new StyleSheet ();
+		#if flash
+		_styleSheet = new StyleSheet();
+		#end
 		
 		_tf = new TextField();
 		_tf.x = 2;
@@ -99,14 +105,19 @@ class Text extends Component
 		_tf.wordWrap = true;
 		_tf.selectable = true;
 		_tf.type = TextFieldType.INPUT;
-    if (_html)
-    {
-      _tf.styleSheet = _styleSheet;
-    }
-    else
-    {
-		  _tf.defaultTextFormat = _format;
-    }
+		
+		#if flash
+		if (_html)
+		{
+			_tf.styleSheet = _styleSheet;
+		}
+		else
+		{
+			_tf.defaultTextFormat = _format;
+		}
+		#else
+		_tf.defaultTextFormat = _format;
+		#end
 
 		_tf.addEventListener(Event.CHANGE, onChange);			
 
@@ -247,7 +258,9 @@ class Text extends Component
 	public function setHtml(b:Bool):Bool
 	{
 		_html = b;
-    _tf.styleSheet = b ? _styleSheet : null;
+		#if flash
+		_tf.styleSheet = b ? _styleSheet : null;
+		#end
 		invalidate();
 		return b;
 	}

@@ -126,7 +126,7 @@ class WheelMenu extends Component {
 	/**
 	 * Hides the menu.
 	 */
-	public function hide():Void 
+	override public function hide():Void 
 	{
 		visible = false;
 		if (stage != null)
@@ -150,7 +150,7 @@ class WheelMenu extends Component {
 	/**
 	 * Shows the menu - placing it on top level of parent and centering around mouse.
 	 */
-	public function show():Void
+	override public function show():Void
 	{
 		x = Math.round(parent.mouseX);
 		y = Math.round(parent.mouseY);
