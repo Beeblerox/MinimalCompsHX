@@ -363,7 +363,8 @@ class List extends Component
       cast(_listItems[i], ListItem).selected = false;
     }
     //cast(event.target, ListItem).selected = true;
-    selectedIndex = _selectedIndex;
+    //selectedIndex = _selectedIndex;
+    _listItems[_selectedIndex].selected =  true;
     dispatchEvent(new Event(Event.SELECT));
   }
   
