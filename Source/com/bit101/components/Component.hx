@@ -89,7 +89,7 @@ class Component implements IEventDispatcher
 	var _tag:Int;
 	var _enabled:Bool;
 	var _parent:Dynamic;
-	
+
 	public static var DRAW:String = "draw";
 
 	/**
@@ -207,8 +207,15 @@ class Component implements IEventDispatcher
 		return _comp.willTrigger( type );
 	}
 	
-	public function startDrag() 
+	public function startDrag(?onStage : Bool = false)
 	{
+		if (onStage)
+		{
+			var p = localToGlobal (new Point (0, 0));
+			stage.addChild (_comp);
+			x = p.x;
+			y = p.y;
+		}
 		_comp.startDrag();
 	}
 	
