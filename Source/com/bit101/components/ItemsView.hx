@@ -141,7 +141,7 @@ class ItemsView extends Component
         for (column in 0..._model.columnCount)
         {
           var w : Float = _model.getItemWidth (column, _width);
-          var item : ViewItem = _model.data (offset + i, column);
+          var item : ViewItemBase = _model.data (offset + i, column);
           item.x = xpos;
           item.y = i * itemHeight;
 

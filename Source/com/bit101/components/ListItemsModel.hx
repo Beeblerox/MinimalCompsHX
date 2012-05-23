@@ -13,7 +13,7 @@ class ListItemsModel implements IItemsModel
   public var columnCount (getColumnCount, null) : Int;
 
   private var _data : Array <Dynamic>;
-  private var _items : Array <ViewItem>;
+  private var _items : Array <ViewItemBase>;
 
   public function new (data : Array <Dynamic>)
   {
@@ -45,7 +45,7 @@ class ListItemsModel implements IItemsModel
     return 20;
   }
 
-  public function data (row : Int, column : Int) : ViewItem
+  public function data (row : Int, column : Int) : ViewItemBase
   {
     var index : Int = row * columnCount + column;
     if (null == _items[index])
