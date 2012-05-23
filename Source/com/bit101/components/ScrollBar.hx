@@ -89,13 +89,16 @@ class ScrollBar extends Component
 	override function addChildren():Void
 	{
 		_scrollSlider = new ScrollSlider(_orientation, this, 0, 10, onChange);
+		_scrollSlider.name = "ScrollSlider";
 		_upButton = new PushButton(this, 0, 0, "");
+		_upButton.name = "ScrollBar._upButton";
 		_upButton.addEventListener(MouseEvent.MOUSE_DOWN, onUpClick);
 		_upButton.setSize(10, 10);
 		var upArrow:Shape = new Shape();
 		_upButton.addChild(upArrow);
 		
 		_downButton = new PushButton(this, 0, 0, "");
+		_downButton.name = "ScrollBar._downButton";
 		_downButton.addEventListener(MouseEvent.MOUSE_DOWN, onDownClick);
 		_downButton.setSize(10, 10);
 		var downArrow:Shape = new Shape();

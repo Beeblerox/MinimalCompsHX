@@ -102,12 +102,14 @@ class Slider extends Component
 	override function addChildren():Void
 	{
 		_back = new Sprite();
+		_back.name = "Slider._back";
 		#if flash
 		_back.filters = [getShadow(2, true)];
 		#end
 		addChild(_back);
 		
 		_handle = new Sprite();
+		_handle.name = "Slider._handle";
 		#if flash
 		_handle.filters = [getShadow(1)];
 		#end
@@ -399,3 +401,4 @@ class Slider extends Component
 	}
 	
 }
+

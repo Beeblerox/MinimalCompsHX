@@ -55,6 +55,7 @@ class ListItem extends ViewItem
 		super.addChildren();
 		_label = new Label(this, 5, 0);
 		_label.draw();
+		name = "ListItem";
 	}
 	
 	///////////////////////////////////
