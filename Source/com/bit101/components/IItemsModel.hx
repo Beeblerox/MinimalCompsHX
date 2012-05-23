@@ -41,5 +41,5 @@ interface IItemsModel
   public function getItemWidth (column : Int, ?width : Float = 0) : Float;
   public function getItemHeight () : Float;
 
-  public function data (row : Int, column : Int) : ViewItem;
+  public function data (row : Int, column : Int) : ViewItemBase;
 }
