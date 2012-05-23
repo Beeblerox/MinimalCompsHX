@@ -100,6 +100,7 @@ package com.bit101.components;
 		override function addChildren():Void
 		{
 			_titleBar = new Panel();
+			_titleBar.name = "Window._titleBar";
 			_titleBar.filters = [];
 			_titleBar.buttonMode = true;
 			_titleBar.useHandCursor = true;
@@ -107,8 +108,10 @@ package com.bit101.components;
 			_titleBar.height = 20;
 			super.addChild(_titleBar);
 			_titleLabel = new Label(_titleBar.content, 5, 1, _title);
+			_titleLabel.name = "Window._titleLabel";
 			
 			_grips = new Shape();
+			_grips.name = "Window._grips";
 			for (i in 0...4)
 			{
 				_grips.graphics.lineStyle(1, 0xffffff, .55);
@@ -122,10 +125,12 @@ package com.bit101.components;
 			_grips.visible = false;
 			
 			_panel = new Panel(null, 0, 20);
+			_panel.name = "Window._panel";
 			_panel.visible = !_minimized;
 			super.addChild(_panel);
 			
 			_minimizeButton = new Sprite();
+			_minimizeButton.name = "Window._minimizeButton";
 			_minimizeButton.graphics.beginFill(0, 0);
 			_minimizeButton.graphics.drawRect(-10, -10, 20, 20);
 			_minimizeButton.graphics.endFill();
@@ -145,6 +150,7 @@ package com.bit101.components;
 			
 			_closeButton = new PushButton(null, 86, 6, "", onClose);
 			_closeButton.setSize(8, 8);
+			_closeButton.name = "Window._closeButton";
 			
 			filters = [];
 			filters.push(getShadow(4, false));

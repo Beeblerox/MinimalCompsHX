@@ -84,6 +84,7 @@ class ItemsView extends Component
     
     
     super(parent, xpos, ypos);
+    name = "ItemsView";
   }
   
   /**
@@ -105,11 +106,14 @@ class ItemsView extends Component
   {
     super.addChildren();
     _panel = new Panel(this, 0, 0);
+    _panel.name = "ItemsView._panel";
     _panel.color = _defaultColor;
     _itemHolder = new Sprite();
+    _itemHolder.name = "ItemsView._itemHolder";
     _panel.content.addChild(_itemHolder);
     _scrollbar = new VScrollBar(this, 0, 0, onScroll);
     _scrollbar.setSliderParams(0, 0, 0);
+    _scrollbar.name = "ItemsView._scrollbar";
   }
   
   /**

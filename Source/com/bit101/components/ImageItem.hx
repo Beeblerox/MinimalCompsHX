@@ -12,6 +12,8 @@ class ImageItem extends ViewItem
   public function new (?parent : Dynamic = null, ?xpos : Float = 0, ?ypos : Float = 0, ?data : Dynamic = null)
   {
     super (parent, xpos, ypos, data);
+    _image.name = "ImageItem._image";
+    component.name = "ImageItem";
   }
 
   override function addChildren () : Void
