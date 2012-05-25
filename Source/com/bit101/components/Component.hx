@@ -186,6 +186,11 @@ class Component implements IEventDispatcher
 	{
 		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
 	}
+
+	public function addWeakListener (type : String, listener : Dynamic -> Void, ?useCapture : Bool = false, ?priority : Int = 0) : Void
+	{
+		_comp.addEventListener (type, listener, useCapture, priority, true);
+	}
 	
 	public function dispatchEvent(event:Event):Bool 
 	{
