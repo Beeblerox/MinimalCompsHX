@@ -24,6 +24,7 @@ class ImageItem extends ViewItem
     super.addChildren ();
     _matrix = new Matrix ();
     _image = new Sprite ();
+    _image.addEventListener (MouseEvent.CLICK, _onClick, false, 0, true);
     this.component.addChild (_image);
   }
 
@@ -43,5 +44,11 @@ class ImageItem extends ViewItem
     _matrix.identity ();
     _matrix.scale (width / _data.width, height / _data.height);
     invalidate ();
+  }
+
+  function _onClick (e : MouseEvent) : Void
+  {
+    dispatchEvent (e);
+    e.stopPropagation ();
   }
 }
