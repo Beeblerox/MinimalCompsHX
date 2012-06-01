@@ -381,11 +381,7 @@ class List extends Component
    */
   function onMouseWheel(event:MouseEvent):Void
   {
-    #if flash
     _scrollbar.value -= event.delta;
-    #else
-    _scrollbar.value += event.delta;
-    #end
     fillItems();
   }
 

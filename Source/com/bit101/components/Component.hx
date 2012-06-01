@@ -46,6 +46,7 @@ import flash.display.Graphics;
 import flash.geom.Point;
 import flash.Lib;
 import flash.text.Font;
+import nme.filters.BitmapFilter;
 
 class PFRondaSeven extends flash.text.Font {}
 
@@ -62,7 +63,11 @@ class Component implements IEventDispatcher
 	public var mouseY(getMouseY, null):Float;
 	public var mouseEnabled(getMouseEnabled, setMouseEnabled):Bool;
 	public var mouseChildren(getMouseChildren, null):Bool;
+	#if flash
+	public var filters(getFilters, setFilters):Array<BitmapFilter>;
+	#else
 	public var filters(getFilters, setFilters):Array<Dynamic>;
+	#end
 	public var useHandCursor(getUseHandCursor, setUseHandCursor):Bool;
 	public var buttonMode(getButtonMode, setButtonMode):Bool;	
 	public var stage(getStage, null):Stage;
@@ -464,6 +469,18 @@ class Component implements IEventDispatcher
 		return b;
 	}
 	
+	#if flash
+	public function getFilters():Array<BitmapFilter>
+	{
+		return _comp.filters;
+	}
+	
+	public function setFilters(filterArr:Array<BitmapFilter>):Array<BitmapFilter>
+	{
+		_comp.filters = filterArr;
+		return filterArr;
+	}
+	#else
 	public function getFilters():Array<Dynamic>
 	{
 		return _comp.filters;
@@ -474,6 +491,7 @@ class Component implements IEventDispatcher
 		_comp.filters = filterArr;
 		return filterArr;
 	}
+	#end
 	
 	public function getStage():Stage
 	{

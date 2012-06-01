@@ -270,11 +270,7 @@ class ItemsView extends Component
    */
   function onMouseWheel(event:MouseEvent):Void
   {
-    #if flash
-    _scrollbar.value -= event.delta;
-    #else
-    _scrollbar.value += event.delta;
-    #end
+   _scrollbar.value -= event.delta;
     onScroll (null);
   }
 

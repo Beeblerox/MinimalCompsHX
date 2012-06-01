@@ -98,7 +98,8 @@ class WheelMenu extends Component {
 		_items = new Array();
 		makeButtons();
 
-		filters = [new DropShadowFilter(4, 45, 0, 1, 4, 4, .2, 4)];
+		filters = [];
+		filters.push(new DropShadowFilter(4, 45, 0, 1, 4, 4, 0.2, 4));
 		hide();
 	}
 	

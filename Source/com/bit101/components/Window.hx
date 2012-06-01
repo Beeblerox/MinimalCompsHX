@@ -146,7 +146,8 @@ package com.bit101.components;
 			_closeButton = new PushButton(null, 86, 6, "", onClose);
 			_closeButton.setSize(8, 8);
 			
-			filters = [getShadow(4, false)];
+			filters = [];
+			filters.push(getShadow(4, false));
 		}
 		
 		
@@ -297,7 +298,8 @@ package com.bit101.components;
 			_shadow = b;
 			if(_shadow)
 			{
-				filters = [getShadow(4, false)];
+				filters = [];
+				filters.push(getShadow(4, false));
 			}
 			else
 			{

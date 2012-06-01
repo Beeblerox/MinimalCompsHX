@@ -98,7 +98,8 @@ class Panel extends Component
 		super.addChild(content);
 		content.mask = _mask;
 		#if flash
-		filters = [getShadow(2, true)];
+		filters = [];
+		filters.push(getShadow(2, true));
 		#end
 	}
 	
@@ -236,7 +237,8 @@ class Panel extends Component
 		#if flash
 		if(_shadow)
 		{
-			filters = [getShadow(2, true)];
+			filters = [];
+			filters.push(getShadow(2, true));
 		}
 		else
 		{
