@@ -28,6 +28,8 @@
  
 package com.bit101.components;
 
+import nme.events.Event;
+
 class HSlider extends Slider
 {
 	/**
@@ -37,7 +39,7 @@ class HSlider extends Slider
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
 	{
 		super(Slider.HORIZONTAL, parent, xpos, ypos, defaultHandler);
 	}

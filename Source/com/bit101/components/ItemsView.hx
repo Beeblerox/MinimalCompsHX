@@ -127,8 +127,8 @@ class ItemsView extends Component
     var offset:Int = Std.int(_scrollbar.value);
     var itemHeight : Float = _model.getItemHeight ();
     var numItems:Int = Math.ceil(_height / itemHeight);
-    numItems = Std.int(Math.min(cast(numItems, Float), cast(_model.rowCount, Float)));
-    numItems = Std.int(Math.max(cast(numItems, Float), 1));
+    numItems = Std.int(Math.min(numItems, _model.rowCount));
+    numItems = Std.int(Math.max(numItems, 1));
     for (i in 0...numItems)
     {
       var xpos : Float = 0;
@@ -202,7 +202,7 @@ class ItemsView extends Component
   {
     super.draw();
     
-    _selectedIndex = Std.int(Math.min(cast(_selectedIndex, Float), cast(_model.rowCount - 1, Float)));
+    _selectedIndex = Std.int(Math.min(_selectedIndex, _model.rowCount - 1));
 
     // panel
     _panel.setSize(_width, _height);

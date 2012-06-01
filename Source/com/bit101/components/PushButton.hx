@@ -29,6 +29,7 @@
 package com.bit101.components;
 
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.events.MouseEvent;
 
 class PushButton extends Component
@@ -58,7 +59,7 @@ class PushButton extends Component
 	 * @param label The string to use for the initial label of this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (click in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
 	{
 		_labelText = "";
 		_over = false;

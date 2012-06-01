@@ -69,7 +69,7 @@ class ScrollBar extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic = null)
+	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
 	{
 		_autoHide = false;
 		_lineSize = 1;
@@ -411,7 +411,7 @@ class ScrollSlider extends Slider
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic = null)
+	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
 	{
 		_thumbPercent = 1.0;
 		_pageSize = 1;

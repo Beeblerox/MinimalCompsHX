@@ -97,8 +97,8 @@ class Accordion extends Component
 	
 	public function addWindowAt(title:String, index:Int):Void
 	{
-		index = Std.int(Math.min(cast(index, Float), cast(_windows.length, Float)));
-		index = Std.int(Math.max(cast(index, Float), 0));
+		index = Std.int(Math.min(index, _windows.length));
+		index = Std.int(Math.max(index, 0));
 		var window:Window = new Window(null, 0, 0, title);
 		_vbox.addChildAt(window, index);
 		window.minimized = true;

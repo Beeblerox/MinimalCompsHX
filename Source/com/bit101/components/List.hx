@@ -144,8 +144,8 @@ class List extends Component
     }
 
     var numItems:Int = Math.ceil(_height / _listItemHeight);
-    numItems = Std.int(Math.min(cast(numItems, Float), cast(_items.length, Float)));
-    numItems = Std.int(Math.max(cast(numItems, Float), 1));
+    numItems = Std.int(Math.min(numItems, _items.length));
+    numItems = Std.int(Math.max(numItems, 1));
     for (i in 0...numItems)
     {
       var item : ListItem = new ListItem (_itemHolder, 0, i * _listItemHeight);
@@ -164,12 +164,12 @@ class List extends Component
   {
     var offset:Int = Std.int(_scrollbar.value);
     var numItems:Int = Math.ceil(_height / _listItemHeight);
-    numItems = Std.int(Math.min(cast(numItems, Float), cast(_items.length, Float)));
+    numItems = Std.int(Math.min(numItems, _items.length));
     
     // TODO: Fix this
     if (_autoHeight)
     {
-      _height = Std.int(Math.min(cast(numItemsToShow * _listItemHeight, Float), cast(numItems * _listItemHeight, Float)));
+      _height = Std.int(Math.min(numItemsToShow * _listItemHeight, numItems * _listItemHeight));
     }
     // TODO: Fix this
     for (i in 0...numItems)
@@ -239,7 +239,7 @@ class List extends Component
   {
     super.draw();
     
-    _selectedIndex = Std.int(Math.min(cast(_selectedIndex, Float), cast(_items.length - 1, Float)));
+    _selectedIndex = Std.int(Math.min(_selectedIndex, _items.length - 1));
 
     // panel
     _panel.setSize(_width, _height);
@@ -287,8 +287,8 @@ class List extends Component
    */
   public function addItemAt(item:Dynamic, index:Int):Void
   {
-    index = Std.int(Math.max(0, cast(index, Float)));
-    index = Std.int(Math.min(cast(_items.length, Float), cast(index, Float)));
+    index = Std.int(Math.max(0, index));
+    index = Std.int(Math.min(_items.length, index));
     //_items.splice(index, 0, item);
     _items.insert(index, item);
     invalidate();
@@ -363,7 +363,8 @@ class List extends Component
       cast(_listItems[i], ListItem).selected = false;
     }
     //cast(event.target, ListItem).selected = true;
-    selectedIndex = _selectedIndex;
+    //selectedIndex = _selectedIndex;
+	_listItems[_selectedIndex].selected =  true;
     dispatchEvent(new Event(Event.SELECT));
   }
   

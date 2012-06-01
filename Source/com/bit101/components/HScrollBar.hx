@@ -28,6 +28,8 @@
 
 package com.bit101.components;
 
+import nme.events.Event;
+
 /**
  * Constructor
  * @param parent The parent DisplayObjectContainer on which to add this ScrollBar.
@@ -37,7 +39,7 @@ package com.bit101.components;
  */
 class HScrollBar extends ScrollBar
 {
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
 	{
 		super(Slider.HORIZONTAL, parent, xpos, ypos, defaultHandler);
 	}

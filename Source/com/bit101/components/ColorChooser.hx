@@ -79,7 +79,7 @@ class ColorChooser extends Component
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
 	
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?value:Int = 0xff0000, ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?value:Int = 0xff0000, ?defaultHandler:Event->Void = null)
 	{
 		_defaultModelColors = [0xFF0000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0000FF, 0xFF00FF, 0xFF0000,0xFFFFFF,0x000000];
 		_oldColorChoice = _value;

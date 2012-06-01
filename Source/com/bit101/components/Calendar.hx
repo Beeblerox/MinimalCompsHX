@@ -206,7 +206,7 @@ class Calendar extends Panel
 			_month = 0;
 			_year++;
 		}
-		_day = Std.int(Math.min(cast(_day, Float), cast(getEndDay(_month,_year), Float)));
+		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
@@ -221,7 +221,7 @@ class Calendar extends Panel
 			_month = 11;
 			_year--;
 		}
-		_day = Std.int(Math.min(cast(_day, Float), cast(getEndDay(_month,_year), Float)));
+		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
@@ -231,7 +231,7 @@ class Calendar extends Panel
 	function onNextYear(event:MouseEvent):Void
 	{
 		_year++;
-		_day = Std.int(Math.min(cast(_day, Float), cast(getEndDay(_month,_year), Float)));
+		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
@@ -241,7 +241,7 @@ class Calendar extends Panel
 	function onPrevYear(event:MouseEvent):Void
 	{
 		_year--;
-		_day = Std.int(Math.min(cast(_day, Float), cast(getEndDay(_month,_year), Float)));
+		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	

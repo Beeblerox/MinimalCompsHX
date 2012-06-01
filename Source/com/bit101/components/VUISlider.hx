@@ -28,6 +28,8 @@
 
 package com.bit101.components;
 
+import nme.events.Event;
+
 class VUISlider extends UISlider
 {
 	
@@ -40,7 +42,7 @@ class VUISlider extends UISlider
 	 * @param label The string to use as the label for this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?label:String = "", ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?label:String = "", ?defaultHandler:Event->Void = null)
 	{
 		_sliderClass = VSlider;
 		super(parent, xpos, ypos, label, defaultHandler);

@@ -28,9 +28,11 @@
 
 package com.bit101.components;
 
+import nme.events.Event;
+
 class VRangeSlider extends RangeSlider
 {
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
 	{
 		super(RangeSlider.VERTICAL, parent, xpos, ypos, defaultHandler);
 	}

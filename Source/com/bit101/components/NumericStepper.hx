@@ -74,7 +74,7 @@ class NumericStepper extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
 	{
 		DELAY_TIME = 500;
 		UP = "up";
@@ -350,7 +350,7 @@ class NumericStepper extends Component
 	public function setRepeatTime(value:Int):Int
 	{
 		// shouldn't be any need to set it faster than 10 ms. guard against negative.
-		_repeatTime = Std.int(Math.max(cast(value, Float), 10));
+		_repeatTime = Std.int(Math.max(value, 10));
 		if (_isRepeatTimerRunning)
 		{
 			_repeatTimer.stop();
