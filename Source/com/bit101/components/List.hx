@@ -355,8 +355,6 @@ class List extends Component
     //if(!Std.is(event.target, ListItem)) return;
     
     var offset:Int = Std.int(_scrollbar.value);
-	
-	trace("offset = " + offset);
     
     for (i in 0..._itemHolder.numChildren)
     {

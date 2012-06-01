@@ -63,7 +63,7 @@ class Slider extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?orientation:String = Slider.HORIZONTAL, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?defaultHandler:Event->Void = null)
+	public function new(?orientation:String = Slider.HORIZONTAL, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?defaultHandler:Dynamic->Void = null)
 	{
 		_backClick = true;
 		_value = 0;
@@ -112,10 +112,10 @@ class Slider extends Component
 		_handle.filters = [getShadow(1)];
 		#end
 		_handle.addEventListener(MouseEvent.MOUSE_DOWN, onDrag);
-		#if flash
+		
 		_handle.buttonMode = true;
 		_handle.useHandCursor = true;
-		#end
+		
 		addChild(_handle);
 	}
 	

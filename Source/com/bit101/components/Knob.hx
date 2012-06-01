@@ -72,7 +72,7 @@ class Knob extends Component
 	 * @param label String containing the label for this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Event->Void = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
 	{
 		_labelText = "";
 		_max = 100;
@@ -105,10 +105,10 @@ class Knob extends Component
 	override function addChildren():Void
 	{
 		_knob = new Sprite();
-		#if flash
+		
 		_knob.buttonMode = true;
 		_knob.useHandCursor = true;
-		#end
+		
 		_knob.addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
 		addChild(_knob);
 		

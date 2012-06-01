@@ -54,7 +54,7 @@ class InputText extends Component
 	 * @param text The string containing the initial text of this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "", ?defaultHandler:Event->Void = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "", ?defaultHandler:Dynamic->Void = null)
 	{
 		super(parent, xpos, ypos);
 		_password = false;

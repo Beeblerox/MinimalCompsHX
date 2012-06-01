@@ -67,7 +67,7 @@ class WheelMenu extends Component {
 	 * @parem innerRadius The radius of the inner circle at the center of the menu.
 	 * @param defaultHandler The event handling function to handle the default event for this component (select in this case).
 	 */
-	public function new(parent:Dynamic, numButtons:Int, ?outerRadius:Int = 80, ?iconRadius:Int = 60, ?innerRadius:Int = 10, ?defaultHandler:Event->Void = null) {	
+	public function new(parent:Dynamic, numButtons:Int, ?outerRadius:Int = 80, ?iconRadius:Int = 60, ?innerRadius:Int = 10, ?defaultHandler:Dynamic->Void = null) {	
 		_borderColor = 0xcccccc;
 		_color = 0xffffff;
 		_highlightColor = 0xeeeeee;

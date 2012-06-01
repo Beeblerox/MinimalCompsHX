@@ -437,35 +437,23 @@ class Component implements IEventDispatcher
 
 	public function getButtonMode():Bool
 	{
-		#if flash
 		return _comp.buttonMode;
-		#else
-		return false;
-		#end
 	}
 	
 	public function setButtonMode(b:Bool):Bool
 	{
-		#if flash
 		_comp.buttonMode = b;
-		#end
 		return b;
 	}
 
 	public function getUseHandCursor():Bool
 	{
-		#if flash
 		return _comp.useHandCursor;
-		#else
-		return false;
-		#end
 	}
 	
 	public function setUseHandCursor(b:Bool):Bool
 	{
-		#if flash
 		_comp.useHandCursor = b;
-		#end
 		return b;
 	}
 	

@@ -80,7 +80,7 @@ class RangeSlider extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
+	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic->Void = null)
 	{
 		_highValue = 100;
 		_labelMode = ALWAYS;
@@ -134,10 +134,10 @@ class RangeSlider extends Component
 		_minHandle.filters = [getShadow(1)];
 		#end
 		_minHandle.addEventListener(MouseEvent.MOUSE_DOWN, onDragMin);
-		#if flash
+		
 		_minHandle.buttonMode = true;
 		_minHandle.useHandCursor = true;
-		#end
+		
 		addChild(_minHandle);
 		
 		_maxHandle = new Sprite();
@@ -145,10 +145,10 @@ class RangeSlider extends Component
 		_maxHandle.filters = [getShadow(1)];
 		#end
 		_maxHandle.addEventListener(MouseEvent.MOUSE_DOWN, onDragMax);
-		#if flash
+		
 		_maxHandle.buttonMode = true;
 		_maxHandle.useHandCursor = true;
-		#end
+		
 		addChild(_maxHandle);			
 		
 		_lowLabel = new Label(this);

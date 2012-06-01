@@ -79,7 +79,7 @@ class ColorChooser extends Component
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
 	
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?value:Int = 0xff0000, ?defaultHandler:Event->Void = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?value:Int = 0xff0000, ?defaultHandler:Dynamic->Void = null)
 	{
 		_defaultModelColors = [0xFF0000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0000FF, 0xFF00FF, 0xFF0000,0xFFFFFF,0x000000];
 		_oldColorChoice = _value;
@@ -256,10 +256,9 @@ class ColorChooser extends Component
 		
 		if (_usePopup) 
 		{
-		//	#if flash
 			_swatch.buttonMode = true;
 			_colorsContainer.buttonMode = true;
-		//	#end
+			
 			_colorsContainer.addEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
 			_colorsContainer.addEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
 			_colorsContainer.addEventListener(MouseEvent.CLICK, setColorChoice);
@@ -268,10 +267,9 @@ class ColorChooser extends Component
 		} 
 		else 
 		{
-		//	#if flash
 			_swatch.buttonMode = false;
 			_colorsContainer.buttonMode = false;
-		//	#end
+			
 			_colorsContainer.removeEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
 			_colorsContainer.removeEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
 			_colorsContainer.removeEventListener(MouseEvent.CLICK, setColorChoice);

@@ -65,10 +65,10 @@ class ScrollPane extends Panel
 		super.init();
 		addEventListener(Event.RESIZE, onResize);
 		_background.addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-		#if flash
+		
 		_background.useHandCursor = true;
 		_background.buttonMode = true;
-		#end
+		
 		setSize(100, 100);
 	}
 	
@@ -199,18 +199,16 @@ class ScrollPane extends Panel
 		if(_dragContent)
 		{
 			_background.addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-			#if flash
+			
 			_background.useHandCursor = true;
 			_background.buttonMode = true;
-			#end
 		}
 		else
 		{
 			_background.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-			#if flash
+			
 			_background.useHandCursor = false;
 			_background.buttonMode = false;
-			#end
 		}
 		return value;
 	}

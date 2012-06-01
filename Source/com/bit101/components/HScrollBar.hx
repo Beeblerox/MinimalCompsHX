@@ -39,7 +39,7 @@ import nme.events.Event;
  */
 class HScrollBar extends ScrollBar
 {
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Event->Void = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic->Void = null)
 	{
 		super(Slider.HORIZONTAL, parent, xpos, ypos, defaultHandler);
 	}

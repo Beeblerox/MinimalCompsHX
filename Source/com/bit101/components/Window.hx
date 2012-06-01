@@ -137,10 +137,10 @@ package com.bit101.components;
 			_minimizeButton.graphics.endFill();
 			_minimizeButton.x = 10;
 			_minimizeButton.y = 10;
-			#if flash
+			
 			_minimizeButton.useHandCursor = true;
 			_minimizeButton.buttonMode = true;
-			#end
+			
 			_minimizeButton.addEventListener(MouseEvent.CLICK, onMinimize);
 			
 			_closeButton = new PushButton(null, 86, 6, "", onClose);

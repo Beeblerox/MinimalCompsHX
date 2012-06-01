@@ -56,7 +56,7 @@ class CheckBox extends Component
 	 * @param label String containing the label for this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (click in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Event->Void = null)
+	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
 	{
 		_labelText = "";
 		_selected = false;
