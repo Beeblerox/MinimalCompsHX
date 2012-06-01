@@ -256,10 +256,10 @@ class ColorChooser extends Component
 		
 		if (_usePopup) 
 		{
-			#if flash
+		//	#if flash
 			_swatch.buttonMode = true;
 			_colorsContainer.buttonMode = true;
-			#end
+		//	#end
 			_colorsContainer.addEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
 			_colorsContainer.addEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
 			_colorsContainer.addEventListener(MouseEvent.CLICK, setColorChoice);
@@ -268,10 +268,10 @@ class ColorChooser extends Component
 		} 
 		else 
 		{
-			#if flash
+		//	#if flash
 			_swatch.buttonMode = false;
 			_colorsContainer.buttonMode = false;
-			#end
+		//	#end
 			_colorsContainer.removeEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
 			_colorsContainer.removeEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
 			_colorsContainer.removeEventListener(MouseEvent.CLICK, setColorChoice);

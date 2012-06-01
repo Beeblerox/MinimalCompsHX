@@ -355,6 +355,8 @@ class List extends Component
     //if(!Std.is(event.target, ListItem)) return;
     
     var offset:Int = Std.int(_scrollbar.value);
+	
+	trace("offset = " + offset);
     
     for (i in 0..._itemHolder.numChildren)
     {
@@ -364,7 +366,17 @@ class List extends Component
     }
     //cast(event.target, ListItem).selected = true;
     //selectedIndex = _selectedIndex;
-	_listItems[_selectedIndex].selected =  true;
+	
+	if (_selectedIndex >= _items.length)
+    {
+		_selectedIndex = -1;
+    }
+	
+	if (_selectedIndex - offset >= 0)
+	{
+		cast(_listItems[_selectedIndex - offset], ListItem).selected =  true;
+	}
+	
     dispatchEvent(new Event(Event.SELECT));
   }
   
