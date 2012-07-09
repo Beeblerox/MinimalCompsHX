@@ -121,9 +121,6 @@ class Panel extends Component
 			child = untyped child._comp;			
 		}
 		return content.addChild(child);
-		
-		//content.addChild(child);
-		//return child;
 	}
 	
 	override public function addChildAt(child:Dynamic, index:Int)
@@ -314,6 +311,15 @@ class Panel extends Component
 	public function getGridColor():Int
 	{
 		return _gridColor;
+	}
+	
+	override public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	{
+		#if !flash
+		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#else
+		content.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#end
 	}
 	
 }
