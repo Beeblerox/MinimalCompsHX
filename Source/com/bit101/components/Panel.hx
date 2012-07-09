@@ -30,6 +30,7 @@ package com.bit101.components;
 
 import flash.display.DisplayObject;
 import flash.display.Sprite;
+import flash.events.Event;
 
 class Panel extends Component
 {
@@ -164,7 +165,6 @@ class Panel extends Component
 	public function addRawChild(child:Dynamic):DisplayObject
 	{
 		return super.addChild(child);
-		//return child;
 	}
 	
 	/**
@@ -319,6 +319,15 @@ class Panel extends Component
 		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
 		#else
 		content.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		#end
+	}
+	
+	override public function dispatchEvent(event:Event):Bool 
+	{
+		#if !flash
+		return _comp.dispatchEvent(event);
+		#else
+		return content.dispatchEvent(event);
 		#end
 	}
 	
