@@ -420,7 +420,7 @@ class Component implements IEventDispatcher
 	
 	public function setMouseEnabled(val:Bool):Bool
 	{
-		_comp.mouseEnabled = true;
+		_comp.mouseEnabled = val;
 		return val;
 	}
 
