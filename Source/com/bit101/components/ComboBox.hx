@@ -243,7 +243,7 @@ class ComboBox extends Component
 			}
 			else
 			{
-				point.y = -_numVisibleItems * _list.listItemHeight;
+				point.y = -_list.height;
 			}
 			point = this.localToGlobal(point);
 			_list.move(point.x, point.y);
