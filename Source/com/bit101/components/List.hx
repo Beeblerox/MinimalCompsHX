@@ -233,6 +233,17 @@ class List extends Component
   ///////////////////////////////////
   
   /**
+   * Sets the size of the list. This alters numItemsToShow.
+   * @param w The width of the list.
+   * @param h The height of the list.
+   */
+  public override function setSize(w:Float, h:Float):Void
+  {
+    _numItemsToShow = Math.ceil(h / _listItemHeight);
+    super.setSize(w, h);
+  }
+  
+  /**
    * Draws the visual ui of the component.
    */
   public override function draw():Void
