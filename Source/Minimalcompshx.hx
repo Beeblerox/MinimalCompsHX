@@ -78,7 +78,6 @@ class Minimalcompshx extends Sprite {
 		container.scaleX = container.scaleY = 1.0;
 		
 		var btn:PushButton = new PushButton(container, 200, 0, "Button", onClick);
-		btn.enabled = false;
 		
 		var fps:FPSMeter = new FPSMeter(Lib.current, 0, 0);
 		

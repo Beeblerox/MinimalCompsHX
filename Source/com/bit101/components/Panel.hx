@@ -313,7 +313,7 @@ class Panel extends Component
 		return _gridColor;
 	}
 	
-	override public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	override public function addEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void
 	{
 		#if !flash
 		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
