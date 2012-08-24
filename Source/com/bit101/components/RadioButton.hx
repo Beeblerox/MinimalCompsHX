@@ -278,7 +278,7 @@ class RadioButton extends Component
 	}
 	
 	
-	override public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	override public function addEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void
 	{
 		#if flash
 		super.addEventListener(type, listener, useCapture, priority, useWeakReference);
@@ -287,7 +287,7 @@ class RadioButton extends Component
 		#end
 	}
 	
-	override public function removeEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false):Void 
+	override public function removeEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false):Void
 	{
 		#if flash
 		super.removeEventListener(type, listener, useCapture);

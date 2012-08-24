@@ -182,7 +182,7 @@ class Component implements IEventDispatcher
 		return _comp.contains(child);
 	}
 	
-	public function addEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false, ?priority:Int = 0, ?useWeakReference:Bool = false):Void 
+	public function addEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void
 	{
 		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
 	}
@@ -202,7 +202,7 @@ class Component implements IEventDispatcher
 		return _comp.hasEventListener(type);
 	}
 	
-	public function removeEventListener(type:String, listener:Dynamic->Void, ?useCapture:Bool = false):Void 
+	public function removeEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false):Void
 	{
 		_comp.removeEventListener(type, listener, useCapture);
 	}
@@ -434,7 +434,7 @@ class Component implements IEventDispatcher
 	
 	public function setMouseEnabled(val:Bool):Bool
 	{
-		_comp.mouseEnabled = true;
+		_comp.mouseEnabled = val;
 		return val;
 	}
 

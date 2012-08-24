@@ -183,6 +183,7 @@ class ComboBox extends Component
 	public function addItem(item:Dynamic):Void
 	{
 		_list.addItem(item);
+		invalidate();
 	}
 	
 	/**
@@ -193,6 +194,7 @@ class ComboBox extends Component
 	public function addItemAt(item:Dynamic, index:Int):Void
 	{
 		_list.addItemAt(item, index);
+		invalidate();
 	}
 	
 	/**
@@ -202,6 +204,7 @@ class ComboBox extends Component
 	public function removeItem(item:Dynamic):Void
 	{
 		_list.removeItem(item);
+		invalidate();
 	}
 	
 	/**
@@ -211,6 +214,7 @@ class ComboBox extends Component
 	public function removeItemAt(index:Int):Void
 	{
 		_list.removeItemAt(index);
+		invalidate();
 	}
 	
 	/**
@@ -219,6 +223,7 @@ class ComboBox extends Component
 	public function removeAll():Void
 	{
 		_list.removeAll();
+		invalidate();
 	}
 
 	
@@ -243,7 +248,7 @@ class ComboBox extends Component
 			}
 			else
 			{
-				point.y = -_numVisibleItems * _list.listItemHeight;
+				point.y = -_list.height;
 			}
 			point = this.localToGlobal(point);
 			_list.move(point.x, point.y);
