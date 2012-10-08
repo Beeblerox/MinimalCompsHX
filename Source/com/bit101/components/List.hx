@@ -287,8 +287,6 @@ class List extends Component
   {
     _items.push(item);
     invalidate();
-    makeListItems();
-    fillItems();
   }
   
   /**
@@ -303,8 +301,6 @@ class List extends Component
     //_items.splice(index, 0, item);
     _items.insert(index, item);
     invalidate();
-    makeListItems();
-    fillItems();
   }
   
   /**
@@ -334,8 +330,6 @@ class List extends Component
     if (index < 0 || index >= _items.length) return;
     _items.splice(index, 1);
     invalidate();
-    makeListItems();
-    fillItems();
   }
   
   /**
@@ -345,8 +339,6 @@ class List extends Component
   {
     _items = [];
     invalidate();
-    makeListItems();
-    fillItems();
   }
   
   
@@ -408,8 +400,7 @@ class List extends Component
 
   function onResize(event:Event):Void
   {
-    makeListItems();
-    fillItems();
+    invalidate ();
   }
   ///////////////////////////////////
   // getter/setters
@@ -531,7 +522,6 @@ class List extends Component
   public function setListItemHeight(value:Float):Float
   {
     _listItemHeight = value;
-    makeListItems();
     invalidate();
     return value;
   }
@@ -562,7 +552,6 @@ class List extends Component
   public function setListItemClass(value:Class<ListItem>):Class<ListItem>
   {
     _listItemClass = value;
-    makeListItems();
     invalidate();
     return value;
   }
@@ -651,6 +640,14 @@ class List extends Component
   {
     _numItemsToShow = Math.ceil(h / _listItemHeight);
     return super.setHeight(h);
+  }
+
+  override function onInvalidate (event : Event) : Void
+  {
+    makeListItems();
+    fillItems();
+
+    super.onInvalidate (event);
   }
 
 }
