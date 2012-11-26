@@ -386,7 +386,7 @@ class ColorChooser extends Component
 		var g1:Sprite = getGradientSprite(w, h, _defaultModelColors);
 		bmd.draw(g1);
 		
-		#if flash 
+		#if (flash || js)
 		var blendmodes = [BlendMode.MULTIPLY, BlendMode.ADD];
 		#else
 		var blendmodes = ["multiply", "add"];

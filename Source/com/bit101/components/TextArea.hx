@@ -78,9 +78,15 @@ class TextArea extends Text
 	 */
 	function updateScrollbar():Void
 	{
+		#if !js
 		var visibleLines:Int = _tf.numLines - _tf.maxScrollV + 1;
 		var percent:Float = visibleLines / _tf.numLines;
 		_scrollbar.setSliderParams(1, _tf.maxScrollV, _tf.scrollV);
+		#else
+		var visibleLines:Int = 1;
+		var percent:Float = 1;
+		_scrollbar.setSliderParams(1, 0, 0);
+		#end
 		_scrollbar.setThumbPercent(percent);
 		_scrollbar.pageSize = visibleLines;
 	}
@@ -141,7 +147,9 @@ class TextArea extends Text
 	 */
 	function onScrollbarScroll(event:Event):Void
 	{
+		#if !js
 		_tf.scrollV = Math.round(_scrollbar.value);
+		#end
 	}
 	
 	/**
@@ -149,7 +157,9 @@ class TextArea extends Text
 	 */
 	function onTextScroll(event:Event):Void
 	{
+		#if !js
 		_scrollbar.value = _tf.scrollV;
+		#end
 		updateScrollbar();
 	}
 	
@@ -159,7 +169,9 @@ class TextArea extends Text
 	function onMouseWheel(event:MouseEvent):Void
 	{
 		_scrollbar.value -= event.delta;
+		#if !js
 		_tf.scrollV = Math.round(_scrollbar.value);
+		#end
 	}
 
 	/**
@@ -197,7 +209,9 @@ class TextArea extends Text
 
   public function goDown () : Void
   {
-		_tf.scrollV = _tf.maxScrollV + 1;
+	#if !js
+	  _tf.scrollV = _tf.maxScrollV + 1;
+	  #end
     _lineAppended = true;
     invalidate ();
   }

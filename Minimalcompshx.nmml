@@ -4,7 +4,7 @@
 	<app title="FlixelNME Test" file="FlixelNMETest" main="Minimalcompshx" version="0.0.1" company="Zaphod" />
 	
 	<window width="400" height="300" fps="30" orientation="portrait" resizable="true" if="target_flash" />
-	<window width="0" height="0" fps="30" orientation="portrait" resizable="true" unless="target_flash" />
+	<window width="800" height="600" fps="30" orientation="portrait" resizable="true" unless="target_flash" hardware="true" />
  	
 	<set name="BUILD_DIR" value="Export" />
 	
