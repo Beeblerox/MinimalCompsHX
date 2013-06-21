@@ -28,34 +28,27 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.filters.DropShadowFilter;
 
 class Meter extends Component
 {
-	
-	public var maximum(getMaximum, setMaximum):Float;
-	public var minimum(getMinimum, setMinimum):Float;
-	public var value(getValue, setValue):Float;
-	public var label(getLabel, setLabel):String;
-	public var showValues(getShowValues, setShowValues):Bool;
-	public var damp(getDamp, setDamp):Float;
-	
-	var _damp:Float;
-	var _dial:Sprite;
-	var _label:Label;
-	var _labelText:String;
-	var _maximum:Float;
-	var _maxLabel:Label;
-	var _minimum:Float;
-	var _minLabel:Label;
-	var _needle:Sprite;
-	var _needleMask:Sprite;
-	var _showValues:Bool;
-	var _targetRotation:Float;
-	var _value:Float;
-	var _velocity:Float;
+	private var _damp:Float = .8;
+	private var _dial:Sprite;
+	private var _label:Label;
+	private var _labelText:String;
+	private var _maximum:Float = 1.0;
+	private var _maxLabel:Label;
+	private var _minimum:Float = 0.0;
+	private var _minLabel:Label;
+	private var _needle:Sprite;
+	private var _needleMask:Sprite;
+	private var _showValues:Bool = true;
+	private var _targetRotation:Float = 0;
+	private var _value:Float = 0.0;
+	private var _velocity:Float = 0;
 	
 	
 	
@@ -67,16 +60,8 @@ class Meter extends Component
 	 * @param ypos The y position to place this component.
 	 * @param text The string to use as the initial text in this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "")
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, text:String = "")
 	{
-		_damp = .8;
-		_maximum = 1.0;
-		_minimum = 0.0;
-		_showValues = true;
-		_targetRotation = 0;
-		_value = 0.0;
-		_velocity = 0;
-		
 		_labelText = text;
 		super(parent, xpos, ypos);
 	}
@@ -84,7 +69,7 @@ class Meter extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		_width = 200;
@@ -95,7 +80,7 @@ class Meter extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{ 
 		_dial = new Sprite();
 		addChild(_dial);
@@ -162,7 +147,7 @@ class Meter extends Component
 	/**
 	 * Draws the background of the component.
 	 */
-	function drawBackground():Void
+	private function drawBackground():Void
 	{
 		graphics.clear();
 		graphics.beginFill(Style.BACKGROUND);
@@ -177,7 +162,7 @@ class Meter extends Component
 	/**
 	 * Draws the dial.
 	 */
-	function drawDial(startAngle:Float, endAngle:Float):Void
+	private function drawDial(startAngle:Float, endAngle:Float):Void
 	{
 		_dial.x = _width / 2;
 		_dial.y = _height * 1.25;
@@ -211,13 +196,13 @@ class Meter extends Component
 	/**
 	 * Draws the tick marks on the dial.
 	 */
-	function drawTicks(startAngle:Float, endAngle:Float):Void
+	private function drawTicks(startAngle:Float, endAngle:Float):Void
 	{
 		var r1:Float = _height * 1.05;
 		var r2:Float = _height * 0.96;
 		var r3:Float = _height * 1.13;
 		var tick:Float = 0;
-		for (i in 0...9)
+		for(i in 0...9)
 		{
 			var angle:Float = startAngle + i * (endAngle - startAngle) / 8;
 			_dial.graphics.moveTo(Math.cos(angle) * r2, Math.sin(angle) * r2);
@@ -235,7 +220,7 @@ class Meter extends Component
 	/**
 	 * Draws the needle.
 	 */
-	function drawNeedle():Void
+	private function drawNeedle():Void
 	{
 		_needle.graphics.clear();
 		_needle.graphics.beginFill(0xff0000);
@@ -251,7 +236,7 @@ class Meter extends Component
 	/**
 	 * Updates the target rotation of the needle and starts an enterframe handler to spring it to that point.
 	 */
-	function update():Void
+	private function update():Void
 	{
 		_value = Math.max(_value, _minimum);
 		_value = Math.min(_value, _maximum);
@@ -266,7 +251,7 @@ class Meter extends Component
 	/**
 	 * Handles the enterFrame event to spring the needle to the target rotation.
 	 */
-	function onEnterFrame(event:Event):Void
+	private function onEnterFrame(event:Event):Void
 	{
 		var dist:Float = _targetRotation - _needle.rotation;
 		_velocity += dist * .05;
@@ -289,15 +274,16 @@ class Meter extends Component
 	/**
 	 * Gets / sets the maximum value for the meter.
 	 */
-	public function setMaximum(value:Float):Float
+	public var maximum(get_maximum, set_maximum):Float;
+	
+	private function set_maximum(value:Float):Float
 	{
 		_maximum = value;
 		_maxLabel.text = Std.string(_maximum);
 		update();
 		return value;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _maximum;
 	}
@@ -305,15 +291,16 @@ class Meter extends Component
 	/**
 	 * Gets / sets the minimum value for the meter.
 	 */
-	public function setMinimum(value:Float):Float
+	public var minimum(get_minimum, set_minimum):Float;
+	
+	private function set_minimum(value:Float):Float
 	{
 		_minimum = value;
 		_minLabel.text = Std.string(_minimum);
 		update();
 		return value;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		return _minimum;
 	}
@@ -321,14 +308,15 @@ class Meter extends Component
 	/**
 	 * Gets / sets the current value for the meter.
 	 */
-	public function setValue(val:Float):Float
+	public var value(get_value, set_value):Float;
+	
+	private function set_value(val:Float):Float
 	{
 		_value = val;
 		update();
 		return val;
 	}
-	
-	public function getValue():Float
+	private function get_value():Float
 	{
 		return _value;
 	}
@@ -336,14 +324,15 @@ class Meter extends Component
 	/**
 	 * Gets / sets the label shown on the meter.
 	 */
-	public function setLabel(value:String):String
+	public var label(get_label, set_label):String;
+	
+	private function set_label(value:String):String
 	{
 		_labelText = value;
 		_label.text = _labelText;
 		return value;
 	}
-	
-	public function getLabel():String
+	private function get_label():String
 	{
 		return _labelText;
 	}
@@ -351,15 +340,16 @@ class Meter extends Component
 	/**
 	 * Gets / sets whether or not value labels will be shown for max and min values.
 	 */
-	public function setShowValues(value:Bool):Bool
+	public var showValues(get_showValues, set_showValues):Bool;
+	
+	private function set_showValues(value:Bool):Bool
 	{
 		_showValues = value;
 		_minLabel.visible = _showValues;
 		_maxLabel.visible = _showValues;
 		return value;
 	}
-	
-	public function getShowValues():Bool
+	private function get_showValues():Bool
 	{
 		return _showValues;
 	}
@@ -367,15 +357,15 @@ class Meter extends Component
 	/**
 	 * Gets / sets the damping value for the meter.
 	 */
-	public function setDamp(value:Float):Float
+	public var damp(get_damp, set_damp):Float;
+	
+	private function set_damp(value:Float):Float
 	{
 		_damp = value;
 		return value;
 	}
-	
-	public function getDamp():Float
+	private function get_damp():Float
 	{
 		return _damp;
 	}
-
 }

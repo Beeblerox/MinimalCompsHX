@@ -30,24 +30,18 @@
 package com.bit101.components;
 
 import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 
 class HBox extends Component
 {
-	
-	public var spacing(getSpacing, setSpacing):Float;
-	public var alignment(getAlignment, setAlignment):String;
-	
-	var _spacing:Float;
-	private var _alignment:String;
-  private var _hAlignment : String;
+	private var _spacing:Float = 5;
+	private var _alignment:String = HBox.NONE;
 	
 	public static inline var TOP:String = "top";
 	public static inline var BOTTOM:String = "bottom";
 	public static inline var MIDDLE:String = "middle";
-
-  public static inline var LEFT : String = "left";
-  public static inline var RIGHT : String = "right";
+	public static inline var NONE:String = "none";
 	
 	
 	/**
@@ -56,21 +50,17 @@ class HBox extends Component
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0)
 	{
-		_spacing = 5;
-		_alignment = TOP;
-    _hAlignment = LEFT;
-		
 		super(parent, xpos, ypos);
 	}
 	
 	/**
 	 * Override of addChild to force layout;
 	 */
-	override public function addChild(child:Dynamic)
+	override public function addChild(child:DisplayObject):DisplayObject
 	{
-		child = super.addChild(child);
+		super.addChild(child);
 		child.addEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -79,9 +69,9 @@ class HBox extends Component
 	/**
 	 * Override of addChildAt to force layout;
 	 */
-	override public function addChildAt(child:Dynamic, index:Int)
+	override public function addChildAt(child:DisplayObject, index:Int):DisplayObject
 	{
-		child = super.addChildAt(child, index);
+		super.addChildAt(child, index);
 		child.addEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -90,9 +80,9 @@ class HBox extends Component
 	/**
 	 * Override of removeChild to force layout;
 	 */
-	override public function removeChild(child:Dynamic)
+	override public function removeChild(child:DisplayObject):DisplayObject
 	{
-		child = super.removeChild(child);
+		super.removeChild(child);
 		child.removeEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -101,120 +91,76 @@ class HBox extends Component
 	/**
 	 * Override of removeChild to force layout;
 	 */
-	override public function removeChildAt(index:Int)
+	override public function removeChildAt(index:Int):DisplayObject
 	{
-		var child = super.removeChildAt(index);
+		var child:DisplayObject = super.removeChildAt(index);
 		child.removeEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
 	}
 
-	function onResize(event:Event):Void
+	private function onResize(event:Event):Void
 	{
 		invalidate();
 	}
 	
-  function doAlignment():Void
-  {
-    var xpos : Float = 0;
-    for(i in 0...numChildren)
-    {
-      var child:DisplayObject = getChildAt(i);
-      if(_alignment == TOP)
-      {
-        child.y = 0;
-      }
-      else if(_alignment == BOTTOM)
-      {
-        child.y = _height - child.height;
-      }
-      else if(_alignment == MIDDLE)
-      {
-        child.y = (_height - child.height) / 2;
-      }
-    }
-
-    if (_hAlignment == LEFT)
-    {
-      var xpos : Float = 0;
-      for (i in 0...numChildren)
-      {
-        var child:DisplayObject = getChildAt(i);
-        if (child.visible)
-        {
-          child.x = xpos;
-          xpos += child.width + _spacing;
-        }
-      }
-    }
-    else if (_hAlignment == RIGHT)
-    {
-      var xpos : Float = 0;
-      for (i in 0...numChildren)
-      {
-        var child:DisplayObject = getChildAt(numChildren - i - 1);
-        if (child.visible)
-        {
-          child.x = _width - xpos - child.width;
-          xpos += child.width + _spacing;
-        }
-      }
-    }
-  }
-
+	private function doAlignment():Void
+	{
+		if(_alignment != HBox.NONE)
+		{
+			for (i in 0...(numChildren))
+			{
+				var child:DisplayObject = getChildAt(i);
+				if(_alignment == HBox.TOP)
+				{
+					child.y = 0;
+				}
+				else if(_alignment == HBox.BOTTOM)
+				{
+					child.y = _height - child.height;
+				}
+				else if(_alignment == HBox.MIDDLE)
+				{
+					child.y = (_height - child.height) / 2;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Draws the visual ui of the component, in this case, laying out the sub components.
 	 */
 	override public function draw():Void
 	{
-    if (_height == 0)
-    {
-      _height = _calculateHeight ();
-    }
-    if (_width == 0)
-    {
-      _width = _calculateWidth ();
-    }
-
-    doAlignment ();
-    dispatchEvent(new Event(Event.RESIZE));
-  }
-
-  function _calculateHeight () : Float
-  {
-    var h : Float = 0;
-    for (i in 0...numChildren)
-    {
-      var child : DisplayObject = getChildAt (i);
-      h = Math.max (h, child.height);
-    }
-
-    return h;
-  }
-
-  function _calculateWidth () : Float
-  {
-    var w : Float = 0;
-    for (i in 0...numChildren)
-    {
-      var child : DisplayObject = getChildAt (i);
-      w += child.width + _spacing;
-    }
-
-    return w;
-  }
-
+		_width = 0;
+		_height = 0;
+		var xpos:Float = 0;
+		for (i in 0...numChildren)
+		{
+			var child:DisplayObject = getChildAt(i);
+			child.x = xpos;
+			xpos += child.width;
+			xpos += _spacing;
+			_width += child.width;
+			_height = Math.max(_height, child.height);
+		}
+		doAlignment();
+		_width += _spacing * (numChildren - 1);
+		dispatchEvent(new Event(Event.RESIZE));
+	}
+	
 	/**
 	 * Gets / sets the spacing between each sub component.
 	 */
-	public function setSpacing(s:Float):Float
+	public var spacing(get_spacing, set_spacing):Float;
+	
+	private function set_spacing(s:Float):Float
 	{
 		_spacing = s;
 		invalidate();
 		return s;
 	}
-	
-	public function getSpacing():Float
+	private function get_spacing():Float
 	{
 		return _spacing;
 	}
@@ -222,29 +168,16 @@ class HBox extends Component
 	/**
 	 * Gets / sets the vertical alignment of components in the box.
 	 */
-	public function setAlignment(value:String):String
+	public var alignment(get_alignment, set_alignment):String;
+	
+	private function set_alignment(value:String):String
 	{
 		_alignment = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getAlignment():String
+	private function get_alignment():String
 	{
 		return _alignment;
-	}
-
-  public function setHorizontalAlignment (value : String) : String
-  {
-    _hAlignment = value;
-    invalidate ();
-    return value;
-  }
-	
-	override public function setVisible(value:Bool):Bool 
-	{
-		super.setVisible(value);
-		dispatchEvent(new Event(Event.RESIZE, true));
-		return value;
 	}
 }

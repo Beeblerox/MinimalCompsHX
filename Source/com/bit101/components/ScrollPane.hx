@@ -28,6 +28,7 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Shape;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -35,14 +36,10 @@ import flash.geom.Rectangle;
 
 class ScrollPane extends Panel
 {
-	
-	public var dragContent(getDragContent, setDragContent):Bool;
-	public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
-	
-	var _vScrollbar:VScrollBar;
-	var _hScrollbar:HScrollBar;
-	var _corner:Shape;
-	var _dragContent:Bool;
+	private var _vScrollbar:VScrollBar;
+	private var _hScrollbar:HScrollBar;
+	private var _corner:Shape;
+	private var _dragContent:Bool = true;
 	
 	/**
 	 * Constructor
@@ -50,32 +47,28 @@ class ScrollPane extends Panel
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0)
 	{
-		_dragContent = true;
-		
 		super(parent, xpos, ypos);
 	}
 	
 	/**
 	 * Initializes this component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		addEventListener(Event.RESIZE, onResize);
 		_background.addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-		
 		_background.useHandCursor = true;
 		_background.buttonMode = true;
-		
 		setSize(100, 100);
 	}
 	
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		super.addChildren();
 		_vScrollbar = new VScrollBar(null, width - 10, 0, onScroll);
@@ -110,7 +103,7 @@ class ScrollPane extends Panel
 		_vScrollbar.x = width - 10;
 		_hScrollbar.y = height - 10;
 		
-		if (hPercent >= 1)
+		if(hPercent >= 1)
 		{
 			_vScrollbar.height = height;
 			_mask.height = height;
@@ -120,7 +113,7 @@ class ScrollPane extends Panel
 			_vScrollbar.height = height - 10;
 			_mask.height = height - 10;
 		}
-		if (vPercent >= 1)
+		if(vPercent >= 1)
 		{
 			_hScrollbar.width = width;
 			_mask.width = width;
@@ -130,7 +123,6 @@ class ScrollPane extends Panel
 			_hScrollbar.width = width - 10;
 			_mask.width = width - 10;
 		}
-		
 		_vScrollbar.setThumbPercent(vPercent);
 		_vScrollbar.maximum = Math.max(0, content.height - _height + 10);
 		_vScrollbar.pageSize = Std.int(_height - 10);
@@ -162,58 +154,57 @@ class ScrollPane extends Panel
 	/**
 	 * Called when either scroll bar is scrolled.
 	 */
-	function onScroll(event:Event):Void
+	private function onScroll(event:Event):Void
 	{
 		content.x = -_hScrollbar.value;
 		content.y = -_vScrollbar.value;
 	}
 	
-	function onResize(event:Event):Void
+	private function onResize(event:Event):Void
 	{
 		invalidate();
 	}
 	
-	function onMouseGoDown(event:MouseEvent):Void
+	private function onMouseGoDown(event:MouseEvent):Void
 	{
 		content.startDrag(false, new Rectangle(0, 0, Math.min(0, _width - content.width - 10), Math.min(0, _height - content.height - 10)));
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
-	function onMouseMove(event:MouseEvent):Void
+	private function onMouseMove(event:MouseEvent):Void
 	{
 		_hScrollbar.value = -content.x;
 		_vScrollbar.value = -content.y;
 	}
 	
-	function onMouseGoUp(event:MouseEvent):Void
+	private function onMouseGoUp(event:MouseEvent):Void
 	{
 		content.stopDrag();
 		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
-
-	public function setDragContent(value:Bool):Bool
+	
+	public var dragContent(get_dragContent, set_dragContent):Bool;
+	
+	private function set_dragContent(value:Bool):Bool
 	{
 		_dragContent = value;
 		if(_dragContent)
 		{
 			_background.addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-			
 			_background.useHandCursor = true;
 			_background.buttonMode = true;
 		}
 		else
 		{
 			_background.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
-			
 			_background.useHandCursor = false;
 			_background.buttonMode = false;
 		}
 		return value;
 	}
-	
-	public function getDragContent():Bool
+	private function get_dragContent():Bool
 	{
 		return _dragContent;
 	}
@@ -221,17 +212,16 @@ class ScrollPane extends Panel
 	/**
 	 * Sets / gets whether the scrollbar will auto hide when there is nothing to scroll.
 	 */
-	public function setAutoHideScrollBar(value:Bool):Bool
+	public var autoHideScrollBar(get_autoHideScrollBar, set_autoHideScrollBar):Bool;
+	
+	private function set_autoHideScrollBar(value:Bool):Bool
 	{
 		_vScrollbar.autoHide = value;
 		_hScrollbar.autoHide = value;
 		return value;
 	}
-	
-	public function getAutoHideScrollBar():Bool
+	private function get_autoHideScrollBar():Bool
 	{
 		return _vScrollbar.autoHide;
 	}
-
-
 }

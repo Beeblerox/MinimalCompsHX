@@ -4,7 +4,6 @@ import com.bit101.charts.BarChart;
 import com.bit101.charts.Chart;
 import com.bit101.charts.LineChart;
 import com.bit101.charts.PieChart;
-import com.bit101.components.TabPanel;
 
 import com.bit101.components.Accordion;
 import com.bit101.components.Calendar;
@@ -119,7 +118,7 @@ class Minimalcompshx extends Sprite {
 		stepper.minimum = 0;
 		stepper.maximum = 100;
 		
-		var range:RangeSlider = new RangeSlider(Slider.HORIZONTAL, container, progress.x, stepper.y + 40);
+		var range:RangeSlider = new RangeSlider(RangeSliderOrientation.HORIZONTAL, container, progress.x, stepper.y + 40);
 		//var slider:Slider = new Slider(Slider.HORIZONTAL, container, range.x, range.y + 20);
 		var slider:HUISlider = new HUISlider(container, range.x, range.y + 20);
 		
@@ -132,8 +131,8 @@ class Minimalcompshx extends Sprite {
 			list.addItem(Std.string(i));
 		}
 		list.removeItem("45");
-		list.numItemsToShow = 6;
-		list.scrollToSelection();
+	//	list.numItemsToShow = 6;
+	//	list.scrollToSelection();
 		
 		vBox = new VBox(container, panel.x + panel.width + 10, panel.y);
 		vBox.setSize(vBox.width, 80);
@@ -169,7 +168,7 @@ class Minimalcompshx extends Sprite {
 		
 		var knob:Knob = new Knob(container, list.x, lineChart.y);
 		
-		var scroll:ScrollBar = new ScrollBar(Slider.VERTICAL, container, list.x + list.width + 20, list.y);
+		var scroll:ScrollBar = new ScrollBar(SliderOrientation.VERTICAL, container, list.x + list.width + 20, list.y);
 		
 		var rotatorySelector:RotarySelector = new RotarySelector(container, knob.x + knob.width + 20, knob.y);
 		rotatorySelector.y += rotatorySelector.height * 0.5;
@@ -206,7 +205,7 @@ class Minimalcompshx extends Sprite {
 		
 		var accordion:Accordion = new Accordion(container, scroll.x + scroll.width + 20, scroll.y);
 		
-		var tabPanel:TabPanel = new TabPanel(container, accordion.x + accordion.width + 20, accordion.y);
+		/*var tabPanel:TabPanel = new TabPanel(container, accordion.x + accordion.width + 20, accordion.y);
 		
 		var list2:List = new List(tabPanel.getTabAt(1));
 		
@@ -218,7 +217,7 @@ class Minimalcompshx extends Sprite {
 		list2.setSize(list2.width, tabPanel.getTabAt(0).height);
 		#else
 		list2.setSize(list2.width, 120);
-		#end
+		#end*/
 		//list2.autoHeight = true;
 	}
 	

@@ -28,32 +28,28 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Rectangle;
 
+enum SliderOrientation 
+{
+	HORIZONTAL;
+	VERTICAL;
+}
+
 class Slider extends Component
 {
-	
-	public var backClick(getBackClick, setBackClick):Bool;
-	public var value(getValue, setValue):Float;
-	public var rawValue(getRawValue, null):Float;
-	public var maximum(getMaximum, setMaximum):Float;
-	public var minimum(getMinimum, setMinimum):Float;
-	public var tick(getTick, setTick):Float;
-	
-	var _handle:Sprite;
-	var _back:Sprite;
-	var _backClick:Bool;
-	var _value:Float;
-	var _max:Float;
-	var _min:Float;
-	var _orientation:String;
-	var _tick:Float;
-	
-	public static inline var HORIZONTAL:String = "horizontal";
-	public static inline var VERTICAL:String = "vertical";
+	private var _handle:Sprite;
+	private var _back:Sprite;
+	private var _backClick:Bool = true;
+	private var _value:Float = 0;
+	private var _max:Float = 100;
+	private var _min:Float = 0;
+	private var _orientation:SliderOrientation;
+	private var _tick:Float = 0.01;
 	
 	/**
 	 * Constructor
@@ -63,15 +59,12 @@ class Slider extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?orientation:String = Slider.HORIZONTAL, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?defaultHandler:Dynamic->Void = null)
+	public function new(orientation:SliderOrientation = null, parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, defaultHandler:Event->Void = null)
 	{
-		_backClick = true;
-		_value = 0;
-		_max = 100;
-		_min = 0;
-		_tick = 0.01;
-		
-		_orientation = orientation;
+		if (orientation == null)
+			_orientation = SliderOrientation.HORIZONTAL;
+		else
+			_orientation = orientation;
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -82,11 +75,11 @@ class Slider extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 
-		if(_orientation == HORIZONTAL)
+		if(_orientation == SliderOrientation.HORIZONTAL)
 		{
 			setSize(100, 10);
 		}
@@ -99,7 +92,7 @@ class Slider extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_back = new Sprite();
 		#if flash
@@ -112,17 +105,15 @@ class Slider extends Component
 		_handle.filters = [getShadow(1)];
 		#end
 		_handle.addEventListener(MouseEvent.MOUSE_DOWN, onDrag);
-		
 		_handle.buttonMode = true;
 		_handle.useHandCursor = true;
-		
 		addChild(_handle);
 	}
 	
 	/**
 	 * Draws the back of the slider.
 	 */
-	function drawBack():Void
+	private function drawBack():Void
 	{
 		_back.graphics.clear();
 		_back.graphics.beginFill(Style.BACKGROUND);
@@ -142,11 +133,11 @@ class Slider extends Component
 	/**
 	 * Draws the handle of the slider.
 	 */
-	function drawHandle():Void
+	private function drawHandle():Void
 	{	
 		_handle.graphics.clear();
-		_handle.graphics.beginFill(Style.LABEL_TEXT);
-		if(_orientation == HORIZONTAL)
+		_handle.graphics.beginFill(Style.BUTTON_FACE);
+		if(_orientation == SliderOrientation.HORIZONTAL)
 		{
 			_handle.graphics.drawRect(1, 1, _height - 2, _height - 2);
 		}
@@ -161,7 +152,7 @@ class Slider extends Component
 	/**
 	 * Adjusts value to be within minimum and maximum.
 	 */
-	function correctValue():Void
+	private function correctValue():Void
 	{
 		if(_max > _min)
 		{
@@ -179,10 +170,10 @@ class Slider extends Component
 	 * Adjusts position of handle when value, maximum or minimum have changed.
 	 * TODO: Should also be called when slider is resized.
 	 */
-	function positionHandle():Void
+	private function positionHandle():Void
 	{
 		var range:Float;
-		if(_orientation == HORIZONTAL)
+		if(_orientation == SliderOrientation.HORIZONTAL)
 		{
 			range = _width - _height;
 			_handle.x = (_value - _min) / (_max - _min) * range;
@@ -235,9 +226,9 @@ class Slider extends Component
 	 * Handler called when user clicks the background of the slider, causing the handle to move to that point. Only active if backClick is true.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onBackClick(event:MouseEvent):Void
+	private function onBackClick(event:MouseEvent):Void
 	{
-		if(_orientation == HORIZONTAL)
+		if(_orientation == SliderOrientation.HORIZONTAL)
 		{
 			_handle.x = mouseX - _height / 2;
 			_handle.x = Math.max(_handle.x, 0);
@@ -259,11 +250,11 @@ class Slider extends Component
 	 * Internal mouseDown handler. Starts dragging the handle.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onDrag(event:MouseEvent):Void
+	private function onDrag(event:MouseEvent):Void
 	{
 		stage.addEventListener(MouseEvent.MOUSE_UP, onDrop);
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, onSlide);
-		if(_orientation == HORIZONTAL)
+		if(_orientation == SliderOrientation.HORIZONTAL)
 		{
 			_handle.startDrag(false, new Rectangle(0, 0, _width - _height, 0));
 		}
@@ -277,7 +268,7 @@ class Slider extends Component
 	 * Internal mouseUp handler. Stops dragging the handle.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onDrop(event:MouseEvent):Void
+	private function onDrop(event:MouseEvent):Void
 	{
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onDrop);
 		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onSlide);
@@ -288,10 +279,10 @@ class Slider extends Component
 	 * Internal mouseMove handler for when the handle is being moved.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onSlide(event:MouseEvent):Void
+	private function onSlide(event:MouseEvent):Void
 	{
 		var oldValue:Float = _value;
-		if(_orientation == HORIZONTAL)
+		if(_orientation == SliderOrientation.HORIZONTAL)
 		{
 			_value = _handle.x / (width - _height) * (_max - _min) + _min;
 		}
@@ -315,14 +306,15 @@ class Slider extends Component
 	/**
 	 * Sets / gets whether or not a click on the background of the slider will move the handler to that position.
 	 */
-	public function setBackClick(b:Bool):Bool
+	public var backClick(get_backClick, set_backClick):Bool;
+	
+	private function set_backClick(b:Bool):Bool
 	{
 		_backClick = b;
 		invalidate();
 		return b;
 	}
-	
-	public function getBackClick():Bool
+	private function get_backClick():Bool
 	{
 		return _backClick;
 	}
@@ -330,16 +322,16 @@ class Slider extends Component
 	/**
 	 * Sets / gets the current value of this slider.
 	 */
-	public function setValue(v:Float):Float
+	public var value(get_value, set_value):Float;
+	
+	private function set_value(v:Float):Float
 	{
 		_value = v;
 		correctValue();
 		positionHandle();
 		return v;
-		
 	}
-	
-	public function getValue():Float
+	private function get_value():Float
 	{
 		return Math.round(_value / _tick) * _tick;
 	}
@@ -347,7 +339,9 @@ class Slider extends Component
 	/**
 	 * Gets the value of the slider without rounding it per the tick value.
 	 */
-	public function getRawValue():Float
+	public var rawValue(get_rawValue, null):Float;
+	
+	private function get_rawValue():Float
 	{
 		return _value;
 	}
@@ -355,15 +349,16 @@ class Slider extends Component
 	/**
 	 * Gets / sets the maximum value of this slider.
 	 */
-	public function setMaximum(m:Float):Float
+	public var maximum(get_maximum, set_maximum):Float;
+	
+	private function set_maximum(m:Float):Float
 	{
 		_max = m;
 		correctValue();
 		positionHandle();
 		return m;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _max;
 	}
@@ -371,15 +366,16 @@ class Slider extends Component
 	/**
 	 * Gets / sets the minimum value of this slider.
 	 */
-	public function setMinimum(m:Float):Float
+	public var minimum(get_minimum, set_minimum):Float;
+	
+	private function set_minimum(m:Float):Float
 	{
 		_min = m;
 		correctValue();
 		positionHandle();
 		return m;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		return _min;
 	}
@@ -387,13 +383,14 @@ class Slider extends Component
 	/**
 	 * Gets / sets the tick value of this slider. This round the value to the nearest multiple of this number. 
 	 */
-	public function setTick(t:Float):Float
+	public var tick(get_tick, set_tick):Float;
+	
+	private function set_tick(t:Float):Float
 	{
 		_tick = t;
 		return t;
 	}
-	
-	public function getTick():Float
+	private function get_tick():Float
 	{
 		return _tick;
 	}

@@ -28,32 +28,21 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
-#if flash
-import flash.text.StyleSheet;
-#end
 
 class Text extends Component
 {
-	public var editable(getEditable, setEditable):Bool;
-	public var text(getText, setText):String;
-	public var html(getHtml, setHtml):Bool;
-	public var selectable(getSelectable, setSelectable):Bool;
-	public var textField(getTextField, null):TextField;
-	
-	var _tf:TextField;
-	var _text:String;
-	var _editable:Bool;
-	var _panel:Panel;
-	var _selectable:Bool;
-	var _html:Bool;
-	var _format:TextFormat;
-	#if flash
-	var _styleSheet : StyleSheet;
-	#end
+	private var _tf:TextField;
+	private var _text:String = "";
+	private var _editable:Bool = true;
+	private var _panel:Panel;
+	private var _selectable:Bool = true;
+	private var _html:Bool = false;
+	private var _format:TextFormat;
 	
 	/**
 	 * Constructor
@@ -62,13 +51,9 @@ class Text extends Component
 	 * @param ypos The y position to place this component.
 	 * @param text The initial text to display in this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "", ?h : Bool = false)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, text:String = "")
 	{
-		_text = "";
-		_editable = true;
-		_selectable = true;
-		_html = h;
-		_text = text;
+		this.text = text;
 		super(parent, xpos, ypos);
 		setSize(200, 100);
 	}
@@ -76,7 +61,7 @@ class Text extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 	}
@@ -84,43 +69,24 @@ class Text extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_panel = new Panel(this);
 		_panel.color = Style.TEXT_BACKGROUND;
 		
 		_format = new TextFormat(Style.fontName, Style.fontSize, Style.LABEL_TEXT);
-		#if flash
-		_styleSheet = new StyleSheet();
-		#end
 		
 		_tf = new TextField();
 		_tf.x = 2;
 		_tf.y = 2;
 		_tf.height = _height;
-		#if flash
- 		_tf.embedFonts = Style.embedFonts;
-		#end
+		_tf.embedFonts = Style.embedFonts;
 		_tf.multiline = true;
 		_tf.wordWrap = true;
 		_tf.selectable = true;
 		_tf.type = TextFieldType.INPUT;
-		
-		#if flash
-		if (_html)
-		{
-			_tf.styleSheet = _styleSheet;
-		}
-		else
-		{
-			_tf.defaultTextFormat = _format;
-		}
-		#else
 		_tf.defaultTextFormat = _format;
-		#end
-
 		_tf.addEventListener(Event.CHANGE, onChange);			
-
 		addChild(_tf);
 	}
 	
@@ -163,10 +129,7 @@ class Text extends Component
 			_tf.selectable = _selectable;
 			_tf.type = TextFieldType.DYNAMIC;
 		}
-    if (!_html)
-    {
-		  _tf.setTextFormat(_format);
-    }
+		_tf.setTextFormat(_format);
 	}
 	
 	
@@ -179,7 +142,7 @@ class Text extends Component
 	/**
 	 * Called when the text in the text field is manually changed.
 	 */
-	function onChange(event:Event):Void
+	private function onChange(event:Event):Void
 	{
 		_text = _tf.text;
 		dispatchEvent(event);
@@ -192,33 +155,26 @@ class Text extends Component
 	/**
 	 * Gets / sets the text of this Label.
 	 */
-	public function setText(t:String):String
+	public var text(get_text, set_text):String;
+	
+	private function set_text(t:String):String
 	{
 		_text = t;
+		if(_text == null) _text = "";
 		invalidate();
 		return t;
 	}
-	public function getText():String
+	private function get_text():String
 	{
 		return _text;
 	}
-
-  public function addLine (l : String) : Void
-  {
-    _text = _text + l + "\n";
-    invalidate ();
-  }
-
-  public function clear () : Void
-  {
-    _text = "";
-    invalidate ();
-  }
 	
 	/**
 	 * Returns a reference to the internal text field in the component.
 	 */
-	public function getTextField():TextField
+	public var textField(get_textField, null):TextField;
+	
+	private function get_textField():TextField
 	{
 		return _tf;
 	}
@@ -226,13 +182,15 @@ class Text extends Component
 	/**
 	 * Gets / sets whether or not this text component will be editable.
 	 */
-	public function setEditable(b:Bool):Bool
+	public var editable(get_editable, set_editable):Bool;
+	
+	private function set_editable(b:Bool):Bool
 	{
 		_editable = b;
 		invalidate();
 		return b;
 	}
-	public function getEditable():Bool
+	private function get_editable():Bool
 	{
 		return _editable;
 	}
@@ -240,14 +198,15 @@ class Text extends Component
 	/**
 	 * Gets / sets whether or not this text component will be selectable. Only meaningful if editable is false.
 	 */
-	public function setSelectable(b:Bool):Bool
+	public var selectable(get_selectable, set_selectable):Bool;
+	
+	private function set_selectable(b:Bool):Bool
 	{
 		_selectable = b;
 		invalidate();
 		return b;
 	}
-	
-	public function getSelectable():Bool
+	public function get_selectable():Bool
 	{
 		return _selectable;
 	}
@@ -255,16 +214,15 @@ class Text extends Component
 	/**
 	 * Gets / sets whether or not text will be rendered as HTML or plain text.
 	 */
-	public function setHtml(b:Bool):Bool
+	public var html(get_html, set_html):Bool;
+	
+	private function set_html(b:Bool):Bool
 	{
 		_html = b;
-		#if flash
-		_tf.styleSheet = b ? _styleSheet : null;
-		#end
 		invalidate();
 		return b;
 	}
-	public function getHtml():Bool
+	private function get_html():Bool
 	{
 		return _html;
 	}
@@ -272,11 +230,11 @@ class Text extends Component
 	/**
 	 * Sets/gets whether this component is enabled or not.
 	 */
-	public override function setEnabled(value:Bool):Bool
+	override private function set_enabled(value:Bool):Bool
 	{
-		super.setEnabled(value);
+		super.enabled = value;
 		#if flash
- 		_tf.tabEnabled = value;
+		_tf.tabEnabled = value;
 		#end
 		return value;
 	}

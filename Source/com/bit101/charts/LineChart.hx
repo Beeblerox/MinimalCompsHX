@@ -28,14 +28,12 @@
 
 package com.bit101.charts;
 
+import flash.display.DisplayObjectContainer;
+
 class LineChart extends Chart
 {
-	
-	public var lineWidth(getLineWidth, setLineWidth):Float;
-	public var lineColor(getLineColor, setLineColor):Int;
-	
-	var _lineWidth:Float;
-	var _lineColor:Int;
+	private var _lineWidth:Float = 1;
+	private var _lineColor:Int = 0x999999;
 	
 	/**
 	 * Constructor
@@ -44,18 +42,15 @@ class LineChart extends Chart
 	 * @param ypos The y position to place this component.
 	 * @param data The array of numeric values to graph.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?data:Array<Float> = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, data:Array<Dynamic> = null)
 	{
-		_lineWidth = 1;
-		_lineColor = 0x999999;
-		
 		super(parent, xpos, ypos, data);
 	}
 	
 	/**
 	 * Graphs the numeric data in the chart.
 	 */
-	override function drawChart():Void
+	private override function drawChart():Void
 	{
 		var border:Float = 2;
 		var lineWidth:Float = (_width - border) / (_data.length - 1);
@@ -69,9 +64,9 @@ class LineChart extends Chart
 		_chartHolder.graphics.lineStyle(_lineWidth, _lineColor);
 		_chartHolder.graphics.moveTo(xpos, (_data[0] - min) * -scale);
 		xpos += lineWidth;
-		for (i in 1..._data.length)
+		for(i in 1...(_data.length))
 		{
-			if(!Math.isNaN(_data[i]))
+			if(_data[i] != null)
 			{
 				_chartHolder.graphics.lineTo(xpos, (_data[i] - min) * -scale);
 			}
@@ -87,14 +82,15 @@ class LineChart extends Chart
 	/**
 	 * Sets/gets the width of the line in the graph.
 	 */
-	public function setLineWidth(value:Float):Float
+	public var lineWidth(get, set):Float;
+	
+	private function set_lineWidth(value:Float):Float
 	{
 		_lineWidth = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getLineWidth():Float
+	private function get_lineWidth():Float
 	{
 		return _lineWidth;
 	}
@@ -102,20 +98,16 @@ class LineChart extends Chart
 	/**
 	 * Sets/gets the color of the line in the graph.
 	 */
-	public function setLineColor(value:Int):Int
+	public var lineColor(get, set):Int;
+	
+	private function set_lineColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_lineColor = value;
-			invalidate();
-		}
+		_lineColor = value;
+		invalidate();
 		return value;
 	}
-	
-	public function getLineColor():Int
+	private function get_lineColor():Int
 	{
 		return _lineColor;
 	}
-
-
 }

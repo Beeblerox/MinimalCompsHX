@@ -29,15 +29,15 @@
 
 package com.bit101.components;
 
-import flash.display.Sprite;
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 
 class Accordion extends Component
 {
-	var _windows:Array<Window>;
-	var _winWidth:Float;
-	var _winHeight:Float;
-	var _vbox:VBox;
+	private var _windows:Array<Window>;
+	private var _winWidth:Float = 100;
+	private var _winHeight:Float = 100;
+	private var _vbox:VBox;
 	
 	/**
 	 * Constructor
@@ -45,18 +45,15 @@ class Accordion extends Component
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float=0, ?ypos:Float = 0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0)
 	{
-		_winWidth = 100;
-		_winHeight = 100;
-		
 		super(parent, xpos, ypos);
 	}
 	
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	private override function init():Void
 	{
 		super.init();
 		setSize(100, 120);
@@ -65,7 +62,7 @@ class Accordion extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		_vbox = new VBox(this);
 		_vbox.spacing = 0;
@@ -77,7 +74,7 @@ class Accordion extends Component
 			window.grips.visible = false;
 			window.draggable = false;
 			window.addEventListener(Event.SELECT, onWindowSelect);
-			if (i != 0) window.minimized = true;
+			if(i != 0) window.minimized = true;
 			_windows.push(window);
 		}
 	}
@@ -126,7 +123,7 @@ class Accordion extends Component
 	override public function draw():Void
 	{
 		_winHeight = Math.max(_winHeight, 40);
-		for (i in 0..._windows.length)
+		for(i in 0...(_windows.length))
 		{
 			_windows[i].setSize(_winWidth, _winHeight);
 			_vbox.draw();
@@ -150,56 +147,48 @@ class Accordion extends Component
 	/**
 	 * Called when any window is resized. If the window has been expanded, it closes all other windows.
 	 */
-	function onWindowSelect(event:Event):Void
+	private function onWindowSelect(event:Event):Void
 	{
-		var spr:Sprite = cast(event.target, Sprite);
-		var window:Window = null;
-		for (i in 0..._windows.length)
-		{
-			if (_windows[i].contains(spr))
-			{
-				window = _windows[i];
-				break;
-			}
-		}
-		if (window != null)
-		{
-			if(window.minimized)
-			{
-				for (i in 0..._windows.length)
-				{
-					_windows[i].minimized = true;
-				}
-				window.minimized = false;
-			}
-			_vbox.draw();
-		}
-		/*
 		var window:Window = cast(event.target, Window);
 		if(window.minimized)
 		{
-			for (i in 0..._windows.length)
+			for(i in 0...(_windows.length))
 			{
 				_windows[i].minimized = true;
 			}
 			window.minimized = false;
 		}
 		_vbox.draw();
-		*/
 	}
 	
-	public override function setWidth(w:Float):Float
+	#if flash
+	@:setter(width) override function set_width(w:Float):Void
 	{
 		_winWidth = w;
-		super.setWidth(w);
+		super.width = w;
+	}
+	#else
+	override function set_width(w:Float):Float
+	{
+		_winWidth = w;
+		super.set_width(w);
 		return w;
 	}
+	#end
 	
-	public override function setHeight(h:Float):Float
+	#if flash
+	@:setter(height) override function set_height(h:Float):Void
 	{
 		_winHeight = h - (_windows.length - 1) * 20;
-		super.setHeight(h);
+		super.height = h;
+	}
+	#else
+	override function set_height(h:Float):Float
+	{
+		_winHeight = h - (_windows.length - 1) * 20;
+		super.set_height(h);
 		return h;
 	}
+	#end
 	
 }

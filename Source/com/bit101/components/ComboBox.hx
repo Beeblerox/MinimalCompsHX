@@ -28,44 +28,30 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Stage;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.Lib;
+
+enum ComboBoxOpenPosition
+{
+	TOP;
+	BOTTOM;
+}
 
 class ComboBox extends Component
 {
-	
-	public var selectedIndex(getSelectedIndex, setSelectedIndex):Int;
-	public var selectedItem(getSelectedItem, setSelectedItem):Dynamic;
-	public var defaultColor(getDefaultColor, setDefaultColor):Int;
-	public var selectedColor(getSelectedColor, setSelectedColor):Int;
-	public var rolloverColor(getRolloverColor, setRolloverColor):Int;
-	public var listItemHeight(getListItemHeight, setListItemHeight):Float;
-	public var openPosition(getOpenPosition, setOpenPosition):String;
-	public var defaultLabel(getDefaultLabel, setDefaultLabel):String;
-	public var numVisibleItems(getNumVisibleItems, setNumVisibleItems):Int;
-	public var items(getItems, setItems):Array<Dynamic>;
-	public var listItemClass(getListItemClass, setListItemClass):Class<ListItem>;
-	public var alternateRows(getAlternateRows, setAlternateRows):Bool;
-	public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
-	public var isOpen(getIsOpen, null):Bool;
-	public var alternateColor(getAlternateColor, setAlternateColor):Int;
-	
-	public static inline var TOP:String = "top";
-	public static inline var BOTTOM:String = "bottom";
-	
-	var _defaultLabel:String;
-	var _dropDownButton:PushButton;
-	var _items:Array<Dynamic>;
-	var _labelButton:PushButton;
-	var _list:List;
-	var _numVisibleItems:Int;
-	var _open:Bool;
-	var _openPosition:String;
-	var _stage:Stage;
-	
+	private var _defaultLabel:String = "";
+	private var _dropDownButton:PushButton;
+	private var _items:Array<Dynamic>;
+	private var _labelButton:PushButton;
+	private var _list:List;
+	private var _numVisibleItems:Int = 6;
+	private var _open:Bool = false;
+	private var _openPosition:ComboBoxOpenPosition;
 	
 	/**
 	 * Constructor
@@ -75,25 +61,19 @@ class ComboBox extends Component
 	 * @param defaultLabel The label to show when no item is selected.
 	 * @param items An array of items to display in the list. Either strings or objects with label property.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultLabel:String = "", ?items:Array<Dynamic> = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, defaultLabel:String = "", items:Array<Dynamic> = null)
 	{
-		_defaultLabel = "";
-		_numVisibleItems = 6;
-		_open = false;
-		_openPosition = BOTTOM;
-		
+		_openPosition = ComboBoxOpenPosition.BOTTOM;
 		_defaultLabel = defaultLabel;
 		_items = items;
-		super(parent, xpos, ypos);
-		if (parent != null) _stage = _comp.stage;
-		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+		super(parent, xpos, ypos);
 	}
 	
 	/**
 	 * Initilizes the component.
 	 */
-	override function init():Void
+	private override function init():Void
 	{
 		super.init();
 		setSize(100, 20);
@@ -103,11 +83,10 @@ class ComboBox extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		super.addChildren();
 		_list = new List(null, 0, 0, _items);
-		_list.autoHeight = true;
 		_list.autoHideScrollBar = true;
 		_list.addEventListener(Event.SELECT, onSelect);
 		
@@ -118,7 +97,7 @@ class ComboBox extends Component
 	/**
 	 * Determines what to use for the main button label and sets it.
 	 */
-	function setLabelButtonLabel():Void
+	private function setLabelButtonLabel():Void
 	{
 		if(selectedItem == null)
 		{
@@ -134,25 +113,17 @@ class ComboBox extends Component
 		}
 		else
 		{
-			_labelButton.label = selectedItem.toString();
+			_labelButton.label = Std.string(selectedItem);
 		}
 	}
 	
 	/**
 	 * Removes the list from the stage.
 	 */
-	function removeList():Void
+	private function removeList():Void
 	{
-		// TODO: Fix this
-		/*if (_stage.contains(_list)) 
-		{
-			_stage.removeChild(_list);
-		}*/
-		if (_list.isDisplayObjectContainsThisComponent(_stage))
-		{
-			_list.removeFromDisplay(_stage);
-		}
-		_stage.removeEventListener(MouseEvent.CLICK, onStageClick);
+		if (Lib.current.stage.contains(_list)) Lib.current.stage.removeChild(_list);
+		Lib.current.stage.removeEventListener(MouseEvent.CLICK, onStageClick);
 		_dropDownButton.label = "+";			
 	}
 	
@@ -183,7 +154,6 @@ class ComboBox extends Component
 	public function addItem(item:Dynamic):Void
 	{
 		_list.addItem(item);
-		invalidate();
 	}
 	
 	/**
@@ -194,7 +164,6 @@ class ComboBox extends Component
 	public function addItemAt(item:Dynamic, index:Int):Void
 	{
 		_list.addItemAt(item, index);
-		invalidate();
 	}
 	
 	/**
@@ -204,7 +173,6 @@ class ComboBox extends Component
 	public function removeItem(item:Dynamic):Void
 	{
 		_list.removeItem(item);
-		invalidate();
 	}
 	
 	/**
@@ -214,7 +182,6 @@ class ComboBox extends Component
 	public function removeItemAt(index:Int):Void
 	{
 		_list.removeItemAt(index);
-		invalidate();
 	}
 	
 	/**
@@ -223,7 +190,6 @@ class ComboBox extends Component
 	public function removeAll():Void
 	{
 		_list.removeAll();
-		invalidate();
 	}
 
 	
@@ -236,26 +202,26 @@ class ComboBox extends Component
 	/**
 	 * Called when one of the top buttons is pressed. Either opens or closes the list.
 	 */
-	function onDropDown(event:MouseEvent):Void
+	private function onDropDown(event:MouseEvent):Void
 	{
 		_open = !_open;
-		if(_open)
+		if (_open)
 		{
 			var point:Point = new Point();
-			if(_openPosition == BOTTOM)
+			if(_openPosition == ComboBoxOpenPosition.BOTTOM)
 			{
 				point.y = _height;
 			}
 			else
 			{
-				point.y = -_list.height;
+				point.y = -_numVisibleItems * _list.listItemHeight;
 			}
 			point = this.localToGlobal(point);
 			_list.move(point.x, point.y);
-			// TODO: Fix this
-			/*_stage.addChild(_list);*/
-			_stage.addEventListener(MouseEvent.CLICK, onStageClick);
-			_list.addToDisplay(_stage);
+			#if !flash
+			_list.parent = Lib.current.stage;
+			#end
+			Lib.current.stage.addChild(_list);
 			_dropDownButton.label = "-";
 		}
 		else
@@ -267,17 +233,12 @@ class ComboBox extends Component
 	/**
 	 * Called when the mouse is clicked somewhere outside of the combo box when the list is open. Closes the list.
 	 */
-	function onStageClick(event:MouseEvent):Void
+	private function onStageClick(event:MouseEvent):Void
 	{
 		// ignore clicks within buttons or list
-		if (_dropDownButton.contains(event.target) || _labelButton.contains(event.target)) 
-		{
-			return;
-		}
-		if (new Rectangle(_list.x, _list.y, _list.width, _list.height).contains(event.stageX, event.stageY)) 
-		{
-			return;
-		}
+		if(event.target == _dropDownButton || event.target == _labelButton) return;
+		if(new Rectangle(_list.x, _list.y, _list.width, _list.height).contains(event.stageX, event.stageY)) return;
+		
 		_open = false;
 		removeList();
 	}
@@ -285,35 +246,22 @@ class ComboBox extends Component
 	/**
 	 * Called when an item in the list is selected. Displays that item in the label button.
 	 */
-	function onSelect(event:Event):Void
+	private function onSelect(event:Event):Void
 	{
 		_open = false;
 		_dropDownButton.label = "+";
-		// TODO: Fix this
-		/*if(stage != null && stage.contains(_list))
+		if(Lib.current.stage.contains(_list))
 		{
-			stage.removeChild(_list);
-		}*/
-		if (_stage != null && _list.isDisplayObjectContainsThisComponent(_stage))
-		{
-			_list.removeFromDisplay(_stage);
+			Lib.current.stage.removeChild(_list);
 		}
 		setLabelButtonLabel();
 		dispatchEvent(event);
 	}
 	
 	/**
-	 * Called when the component is added to the stage.
-	 */
-	function onAddedToStage(event:Event):Void
-	{
-		_stage = _comp.stage;
-	}
-	
-	/**
 	 * Called when the component is removed from the stage.
 	 */
-	function onRemovedFromStage(event:Event):Void
+	private function onRemovedFromStage(event:Event):Void
 	{
 		removeList();
 	}
@@ -325,14 +273,15 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the index of the selected list item.
 	 */
-	public function setSelectedIndex(value:Int):Int
+	public var selectedIndex(get, set):Int;
+	
+	private function set_selectedIndex(value:Int):Int
 	{
 		_list.selectedIndex = value;
 		setLabelButtonLabel();
 		return value;
 	}
-	
-	public function getSelectedIndex():Int
+	private function get_selectedIndex():Int
 	{
 		return _list.selectedIndex;
 	}
@@ -340,14 +289,15 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the item in the list, if it exists.
 	 */
-	public function setSelectedItem(item:Dynamic):Dynamic
+	public var selectedItem(get, set):Dynamic;
+	
+	private function set_selectedItem(item:Dynamic):Dynamic
 	{
 		_list.selectedItem = item;
 		setLabelButtonLabel();
 		return item;
 	}
-	
-	public function getSelectedItem():Dynamic
+	private function get_selectedItem():Dynamic
 	{
 		return _list.selectedItem;
 	}
@@ -355,16 +305,14 @@ class ComboBox extends Component
 	/**
 	 * Sets/gets the default background color of list items.
 	 */
-	public function setDefaultColor(value:Int):Int
+	public var defaultColor(get, set):Int;
+	
+	private function set_defaultColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_list.defaultColor = value;
-		}
+		_list.defaultColor = value;
 		return value;
 	}
-	
-	public function getDefaultColor():Int
+	private function get_defaultColor():Int
 	{
 		return _list.defaultColor;
 	}
@@ -372,16 +320,14 @@ class ComboBox extends Component
 	/**
 	 * Sets/gets the selected background color of list items.
 	 */
-	public function setSelectedColor(value:Int):Int
+	public var selectedColor(get, set):Int;
+	
+	private function set_selectedColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_list.selectedColor = value;
-		}
+		_list.selectedColor = value;
 		return value;
 	}
-	
-	public function getSelectedColor():Int
+	private function get_selectedColor():Int
 	{
 		return _list.selectedColor;
 	}
@@ -389,16 +335,14 @@ class ComboBox extends Component
 	/**
 	 * Sets/gets the rollover background color of list items.
 	 */
-	public function setRolloverColor(value:Int):Int
+	public var rolloverColor(get, set):Int;
+	
+	private function set_rolloverColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_list.rolloverColor = value;
-		}
+		_list.rolloverColor = value;
 		return value;
 	}
-	
-	public function getRolloverColor():Int
+	private function get_rolloverColor():Int
 	{
 		return _list.rolloverColor;
 	}
@@ -406,14 +350,15 @@ class ComboBox extends Component
 	/**
 	 * Sets the height of each list item.
 	 */
-	public function setListItemHeight(value:Float):Float
+	public var listItemHeight(get, set):Float;
+	
+	private function set_listItemHeight(value:Float):Float
 	{
 		_list.listItemHeight = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getListItemHeight():Float
+	private function get_listItemHeight():Float
 	{
 		return _list.listItemHeight;
 	}
@@ -421,13 +366,14 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the position the list will open on: top or bottom.
 	 */
-	public function setOpenPosition(value:String):String
+	public var openPosition(get, set):ComboBoxOpenPosition;
+	
+	private function set_openPosition(value:ComboBoxOpenPosition):ComboBoxOpenPosition
 	{
 		_openPosition = value;
 		return value;
 	}
-	
-	public function getOpenPosition():String
+	private function get_openPosition():ComboBoxOpenPosition
 	{
 		return _openPosition;
 	}
@@ -435,14 +381,15 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the label that will be shown if no item is selected.
 	 */
-	public function setDefaultLabel(value:String):String
+	public var defaultLabel(get, set):String;
+	
+	private function set_defaultLabel(value:String):String
 	{
 		_defaultLabel = value;
 		setLabelButtonLabel();
 		return value;
 	}
-	
-	public function getDefaultLabel():String
+	private function get_defaultLabel():String
 	{
 		return _defaultLabel;
 	}
@@ -450,14 +397,15 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the number of visible items in the drop down list. i.e. the height of the list.
 	 */
-	public function setNumVisibleItems(value:Int):Int
+	public var numVisibleItems(get, set):Int;
+	
+	private function set_numVisibleItems(value:Int):Int
 	{
-		_numVisibleItems = value;
+		_numVisibleItems = Std.int(Math.max(1, value));
 		invalidate();
 		return value;
 	}
-	
-	public function getNumVisibleItems():Int
+	private function get_numVisibleItems():Int
 	{
 		return _numVisibleItems;
 	}
@@ -465,17 +413,14 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the list of items to be shown.
 	 */
-	public function setItems(value:Array<Dynamic>):Array<Dynamic>
+	public var items(get, set):Array<Dynamic>;
+	
+	private function set_items(value:Array<Dynamic>):Array<Dynamic>
 	{
-		removeAll();
-		for (o in value) 
-		{
-			addItem(o);
-		}
+		_list.items = value;
 		return value;
 	}
-	
-	public function getItems():Array<Dynamic>
+	private function get_items():Array<Dynamic>
 	{
 		return _list.items;
 	}
@@ -483,13 +428,14 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the class used to render list items. Must extend ListItem.
 	 */
-	public function setListItemClass(value:Class<ListItem>):Class<ListItem>
+	public var listItemClass(get, set):Class<ListItem>;
+	
+	private function set_listItemClass(value:Class<ListItem>):Class<ListItem>
 	{
 		_list.listItemClass = value;
 		return value;
 	}
-	
-	public function getListItemClass():Class<ListItem>
+	private function get_listItemClass():Class<ListItem>
 	{
 		return _list.listItemClass;
 	}
@@ -498,16 +444,13 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets the color for alternate rows if alternateRows is set to true.
 	 */
-	public function setAlternateColor(value:Int):Int
+	public var alternateColor(get, set):Int;
+	private function set_alternateColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_list.alternateColor = value;
-		}
+		_list.alternateColor = value;
 		return value;
 	}
-	
-	public function getAlternateColor():Int
+	private function get_alternateColor():Int
 	{
 		return _list.alternateColor;
 	}
@@ -515,13 +458,14 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets whether or not every other row will be colored with the alternate color.
 	 */
-	public function setAlternateRows(value:Bool):Bool
+	public var alternateRows(get, set):Bool;
+	
+	private function set_alternateRows(value:Bool):Bool
 	{
 		_list.alternateRows = value;
 		return value;
 	}
-	
-	public function getAlternateRows():Bool
+	private function get_alternateRows():Bool
 	{
 		return _list.alternateRows;
 	}
@@ -529,14 +473,15 @@ class ComboBox extends Component
 	/**
 	 * Sets / gets whether the scrollbar will auto hide when there is nothing to scroll.
 	 */
-	public function setAutoHideScrollBar(value:Bool):Bool
+	public var autoHideScrollBar(get, set):Bool;
+	
+	private function set_autoHideScrollBar(value:Bool):Bool
 	{
 		_list.autoHideScrollBar = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getAutoHideScrollBar():Bool
+	private function get_autoHideScrollBar():Bool
 	{
 		return _list.autoHideScrollBar;
 	}
@@ -544,7 +489,9 @@ class ComboBox extends Component
 	/**
 	 * Gets whether or not the combo box is currently open.
 	 */
-	public function getIsOpen():Bool
+	public var isOpen(get, null):Bool;
+	
+	private function get_isOpen():Bool
 	{
 		return _open;
 	}

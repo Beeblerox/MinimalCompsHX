@@ -34,6 +34,7 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.BlendMode;
 import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.display.GradientType;
 import flash.display.Graphics;
 import flash.display.InterpolationMethod;
@@ -45,30 +46,26 @@ import flash.events.MouseEvent;
 import flash.geom.Matrix;
 import flash.geom.Point;
 
+enum ColorChooserAlign
+{
+	TOP;
+	BOTTOM;
+}
+
 class ColorChooser extends Component
 {
-	
-	public var value(getValue, setValue):Int;
-	public var model(getModel, setModel):DisplayObject;
-	public var popupAlign(getPopupAlign, setPopupAlign):String;
-	public var usePopup(getUsePopup, setUsePopup):Bool;
-	
-	public static inline var TOP:String = "top";
-	public static inline var BOTTOM:String = "bottom";
-	
-	var _colors:BitmapData;
-	var _colorsContainer:Sprite;
-	var _defaultModelColors:Array<Int>;
-	var _input:InputText;
-	var _model:DisplayObject;
-	var _oldColorChoice:Int;
-	var _popupAlign:String;
-	var _stage:Stage;
-	var _swatch:Sprite;
-	var _tmpColorChoice:Int;
-	var _usePopup:Bool;
-	var _value:Int;
-	
+	private var _colors:BitmapData;
+	private var _colorsContainer:Sprite;
+	private var _defaultModelColors:Array<Int>;
+	private var _input:InputText;
+	private var _model:DisplayObject;
+	private var _oldColorChoice:Int;
+	private var _popupAlign:ColorChooserAlign;
+	private var _stage:Stage;
+	private var _swatch:Sprite;
+	private var _tmpColorChoice:Int;
+	private var _usePopup:Bool = false;
+	private var _value:Int;
 	
 	/**
 	 * Constructor
@@ -78,24 +75,11 @@ class ColorChooser extends Component
 	 * @param value The initial color value of this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?value:Int = 0xff0000, ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, value:Int = 0xff0000, defaultHandler:Event->Void = null)
 	{
+		_oldColorChoice = _tmpColorChoice = _value = value;
+		_popupAlign = ColorChooserAlign.BOTTOM;
 		_defaultModelColors = [0xFF0000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0000FF, 0xFF00FF, 0xFF0000,0xFFFFFF,0x000000];
-		_oldColorChoice = _value;
-		_popupAlign = BOTTOM;
-		_tmpColorChoice = _value;
-		_usePopup = false;
-		if (value >= 0)
-		{
-			_value = value;
-		}
-		else 
-		{
-			_value = 0xff0000;
-		}
-		
-		_oldColorChoice = _tmpColorChoice = _value;
 		
 		super(parent, xpos, ypos);
 		
@@ -103,15 +87,13 @@ class ColorChooser extends Component
 		{
 			addEventListener(Event.CHANGE, defaultHandler);
 		}
-			
 	}		
 	
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
-		
 		super.init();
 
 		_width = 65;
@@ -119,14 +101,14 @@ class ColorChooser extends Component
 		value = _value;
 	}
 	
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_input = new InputText();
 		_input.width = 45;
 		_input.restrict = "0123456789ABCDEFabcdef";
 		_input.maxChars = 6;
-		_input.addEventListener(Event.CHANGE, onChange);
 		addChild(_input);
+		_input.addEventListener(Event.CHANGE, onChange);
 		
 		_swatch = new Sprite();
 		_swatch.x = 50;
@@ -166,10 +148,10 @@ class ColorChooser extends Component
 	 * Internal change handler.
 	 * @param event The Event passed by the system.
 	 */
-	function onChange(event:Event):Void
+	private function onChange(event:Event):Void
 	{
 		event.stopImmediatePropagation();
-		_value = Std.parseInt("0x" + _input.text/*, 16*/);
+		Std.parseInt("0x" + _input.text/*, 16*/);
 		_input.text = _input.text.toUpperCase();
 		_oldColorChoice = value;
 		invalidate();
@@ -184,23 +166,21 @@ class ColorChooser extends Component
 	/**
 	 * Gets / sets the color value of this ColorChooser.
 	 */
-	public function setValue(n:Int):Int
+	public var value(get, set):Int;
+	
+	private function set_value(n:Int):Int
 	{
-		if (value >= 0)
+		var str = StringTools.hex(n).toUpperCase();
+		while(str.length < 6)
 		{
-			var str = StringTools.hex(n).toUpperCase();
-			while(str.length < 6)
-			{
-				str = "0" + str;
-			}
-			_input.text = str;
-			_value = Std.parseInt("0x" + _input.text/*, 16*/);
-			invalidate();
+			str = "0" + str;
 		}
+		_input.text = str;
+		_value = Std.parseInt("0x" + _input.text/*, 16*/);
+		invalidate();
 		return n;
 	}
-	
-	public function getValue():Int
+	private function get_value():Int
 	{
 		return _value;
 	}
@@ -208,23 +188,19 @@ class ColorChooser extends Component
 	///////////////////////////////////
 	// COLOR PICKER MODE SUPPORT
 	///////////////////////////////////}
+	public var model(get, set):DisplayObject;
 	
-	
-	public function getModel():DisplayObject 
+	private function get_model():DisplayObject 
 	{ 
 		return _model; 
 	}
-	
-	public function setModel(value:DisplayObject):DisplayObject 
+	private function set_model(value:DisplayObject):DisplayObject 
 	{
 		_model = value;
-		if (_model != null) 
-		{
+		if (_model!=null) {
 			drawColors(_model);
 			if (!usePopup) usePopup = true;
-		} 
-		else 
-		{
+		} else {
 			_model = getDefaultModel();
 			drawColors(_model);
 			usePopup = false;
@@ -232,52 +208,33 @@ class ColorChooser extends Component
 		return value;
 	}
 	
-	function drawColors(d:DisplayObject):Void
+	private function drawColors(d:DisplayObject):DisplayObject
 	{
 		_colors = new BitmapData(Std.int(d.width), Std.int(d.height));
 		_colors.draw(d);
 		while (_colorsContainer.numChildren > 0) _colorsContainer.removeChildAt(0);
 		_colorsContainer.addChild(new Bitmap(_colors));
 		placeColors();
+		return d;
 	}
 	
-	public function getPopupAlign():String { return _popupAlign; }
-	public function setPopupAlign(value:String):String 
+	public var popupAlign(get, set):ColorChooserAlign;
+	
+	private function get_popupAlign():ColorChooserAlign { return _popupAlign; }
+	private function set_popupAlign(value:ColorChooserAlign):ColorChooserAlign 
 	{
 		_popupAlign = value;
 		placeColors();
 		return value;
 	}
 	
-	public function getUsePopup():Bool { return _usePopup; }
-	public function setUsePopup(value:Bool):Bool 
+	public var usePopup(get, set):Bool;
+	
+	private function get_usePopup():Bool { return _usePopup; }
+	private function set_usePopup(value:Bool):Bool 
 	{
 		_usePopup = value;
 		
-		if (_usePopup) 
-		{
-			_swatch.buttonMode = true;
-			_colorsContainer.buttonMode = true;
-			
-			_colorsContainer.addEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
-			_colorsContainer.addEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
-			_colorsContainer.addEventListener(MouseEvent.CLICK, setColorChoice);
-			_swatch.addEventListener(MouseEvent.CLICK, onSwatchClick);
-			_input.addEventListener(MouseEvent.CLICK, onSwatchClick);
-		} 
-		else 
-		{
-			_swatch.buttonMode = false;
-			_colorsContainer.buttonMode = false;
-			
-			_colorsContainer.removeEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
-			_colorsContainer.removeEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
-			_colorsContainer.removeEventListener(MouseEvent.CLICK, setColorChoice);
-			_swatch.removeEventListener(MouseEvent.CLICK, onSwatchClick);
-			_input.removeEventListener(MouseEvent.CLICK, onSwatchClick);
-		}
-		
-		/*
 		_swatch.buttonMode = true;
 		_colorsContainer.buttonMode = true;
 		_colorsContainer.addEventListener(MouseEvent.MOUSE_MOVE, browseColorChoice);
@@ -292,7 +249,7 @@ class ColorChooser extends Component
 			_colorsContainer.removeEventListener(MouseEvent.MOUSE_OUT, backToColorChoice);
 			_colorsContainer.removeEventListener(MouseEvent.CLICK, setColorChoice);
 			_swatch.removeEventListener(MouseEvent.CLICK, onSwatchClick);
-		}*/
+		}
 		
 		return value;
 	}
@@ -301,43 +258,39 @@ class ColorChooser extends Component
 	 * The color picker mode Handlers 
 	 */
 	
-	function onColorsRemovedFromStage(e:Event):Void 
-	{
+	private function onColorsRemovedFromStage(e:Event):Void {
 		_stage.removeEventListener(MouseEvent.CLICK, onStageClick);
 	}
 	
-	function onColorsAddedToStage(e:Event):Void 
-	{
+	private function onColorsAddedToStage(e:Event):Void {
 		_stage = stage;
 		_stage.addEventListener(MouseEvent.CLICK, onStageClick);
 	}
 	
-	function onStageClick(e:MouseEvent):Void 
-	{
+	private function onStageClick(e:MouseEvent):Void {
 		displayColors();
 	}
 	 
 	
-	function onSwatchClick(event:MouseEvent):Void 
+	private function onSwatchClick(event:MouseEvent):Void 
 	{
 		event.stopImmediatePropagation();
 		displayColors();
 	}
 	
-	function backToColorChoice(e:MouseEvent):Void 
+	private function backToColorChoice(e:MouseEvent):Void 
 	{
 		value = _oldColorChoice;
 	}
 	
-	function setColorChoice(e:MouseEvent):Void 
-	{
+	private function setColorChoice(e:MouseEvent):Void {
 		value = _colors.getPixel(Std.int(_colorsContainer.mouseX), Std.int(_colorsContainer.mouseY));
 		_oldColorChoice = value;
 		dispatchEvent(new Event(Event.CHANGE));
 		displayColors();
 	}
 	
-	function browseColorChoice(e:MouseEvent):Void 
+	private function browseColorChoice(e:MouseEvent):Void 
 	{
 		_tmpColorChoice = _colors.getPixel(Std.int(_colorsContainer.mouseX), Std.int(_colorsContainer.mouseY));
 		value = _tmpColorChoice;
@@ -347,26 +300,22 @@ class ColorChooser extends Component
 	 * The color picker mode Display functions
 	 */
 	
-	function displayColors():Void 
+	private function displayColors():Void 
 	{
 		placeColors();
 		if (_colorsContainer.parent != null) _colorsContainer.parent.removeChild(_colorsContainer);
 		else stage.addChild(_colorsContainer);
 	}		
 	
-	function placeColors():Void
+	private function placeColors():Void
 	{
 		var point:Point = new Point(x, y);
-		// TODO: LocalToLocal the x and y to place it properly.
 		if(parent != null) point = parent.localToGlobal(point);
 		switch (_popupAlign)
 		{
-			case TOP : 
+			case ColorChooserAlign.TOP:
 				_colorsContainer.x = point.x;
 				_colorsContainer.y = point.y - _colorsContainer.height - 4;
-			case BOTTOM : 
-				_colorsContainer.x = point.x;
-				_colorsContainer.y = point.y + 22;
 			default: 
 				_colorsContainer.x = point.x;
 				_colorsContainer.y = point.y + 22;
@@ -376,8 +325,7 @@ class ColorChooser extends Component
 	/**
 	 * Create the default gradient Model
 	 */
-
-	function getDefaultModel():Sprite 
+	private function getDefaultModel():Sprite 
 	{	
 		var w:Int = 100;
 		var h:Int = 100;
@@ -386,47 +334,43 @@ class ColorChooser extends Component
 		var g1:Sprite = getGradientSprite(w, h, _defaultModelColors);
 		bmd.draw(g1);
 		
-		#if (flash || js)
-		var blendmodes = [BlendMode.MULTIPLY, BlendMode.ADD];
-		#else
-		var blendmodes = ["multiply", "add"];
-		#end
+		var blendmodes:Array<BlendMode> = [BlendMode.MULTIPLY,BlendMode.ADD];
 		var nb:Int = blendmodes.length;
 		var g2:Sprite = getGradientSprite(h/nb, w, [0xFFFFFF, 0x000000]);		
 		
-		for (i in 0...nb) 
-		{
-			var blendmode = blendmodes[i];
+		for (i in 0...nb) {
+			var blendmode:BlendMode = blendmodes[i];
 			var m:Matrix = new Matrix();
 			m.rotate(-Math.PI / 2);
-			m.translate(0, h / nb * i + h/nb);
-			
+			m.translate(0, h / nb * i + h / nb);
+			#if flash
 			bmd.draw(g2, m, null, blendmode);
+			#end
 		}
 		
 		var s:Sprite = new Sprite();
 		var bm:Bitmap = new Bitmap(bmd);
 		s.addChild(bm);
-		return s;
+		return(s);
 	}
 	
-	function getGradientSprite(w:Float, h:Float, gc:Array<Int>):Sprite 
+	private function getGradientSprite(w:Float, h:Float, gc:Array<Int>):Sprite 
 	{
 		var gs:Sprite = new Sprite();
 		var g:Graphics = gs.graphics;
 		var gn:Int = gc.length;
-		var ga = [];
-		var gr = [];
+		var ga:Array<Float> = [];
+		var gr:Array<Float> = [];
 		var gm:Matrix = new Matrix(); 
 		gm.createGradientBox(w, h, 0, 0, 0);
 		for (i in 0...gn) 
 		{ 
 			ga.push(1); 
-			gr.push(0x00 + 0xFF / (gn - 1) * i); 
+			gr.push(0x00 + (0xFF / (gn - 1) * i)); 
 		}
 		g.beginGradientFill(GradientType.LINEAR, gc, ga, gr, gm, SpreadMethod.PAD, InterpolationMethod.RGB);
 		g.drawRect(0, 0, w, h);
 		g.endFill();	
-		return gs;
+		return(gs);
 	}
 }

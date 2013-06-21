@@ -26,6 +26,7 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.text.TextField;
@@ -34,17 +35,10 @@ import flash.text.TextFormat;
 
 class InputText extends Component
 {
-	
-	public var maxChars(getMaxChars, setMaxChars):Int;
-	public var password(getPassword, setPassword):Bool;
-	public var restrict(getRestrict, setRestrict):String;
-	public var text(getText, setText):String;
-	public var textField(getTextField, null):TextField;
-	
-	var _back:Sprite;
-	var _password:Bool;
-	var _text:String;
-	var _tf:TextField;
+	private var _back:Sprite;
+	private var _password:Bool = false;
+	private var _text:String = "";
+	private var _tf:TextField;
 	
 	/**
 	 * Constructor
@@ -54,12 +48,10 @@ class InputText extends Component
 	 * @param text The string containing the initial text of this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?text:String = "", ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, text:String = "", defaultHandler:Event->Void = null)
 	{
-		super(parent, xpos, ypos);
-		_password = false;
-		_text = "";
 		this.text = text;
+		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
 			addEventListener(Event.CHANGE, defaultHandler);
@@ -69,7 +61,7 @@ class InputText extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		setSize(100, 16);
@@ -78,7 +70,7 @@ class InputText extends Component
 	/**
 	 * Creates and adds child display objects.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_back = new Sprite();
 		#if flash
@@ -87,9 +79,7 @@ class InputText extends Component
 		addChild(_back);
 		
 		_tf = new TextField();
-		#if flash
 		_tf.embedFonts = Style.embedFonts;
-		#end
 		_tf.selectable = true;
 		_tf.type = TextFieldType.INPUT;
 		_tf.defaultTextFormat = new TextFormat(Style.fontName, Style.fontSize, Style.INPUT_TEXT);
@@ -112,23 +102,20 @@ class InputText extends Component
 	{
 		super.draw();
 		_back.graphics.clear();
-		
-		#if !flash
-		_back.graphics.lineStyle(1, 0, 0.1);
-		#end
-		
-		#if flash
 		_back.graphics.beginFill(Style.BACKGROUND);
-		#else
-		_back.graphics.beginFill(Style.PANEL);
-		#end
-		
 		_back.graphics.drawRect(0, 0, _width, _height);
 		_back.graphics.endFill();
 		
 		_tf.displayAsPassword = _password;
 		
-		_tf.text = _text;
+		if(_text != null)
+		{
+			_tf.text = _text;
+		}
+		else 
+		{
+			_tf.text = "";
+		}
 		_tf.width = _width - 4;
 		if(_tf.text == "")
 		{
@@ -155,7 +142,7 @@ class InputText extends Component
 	 * Internal change handler.
 	 * @param event The Event passed by the system.
 	 */
-	function onChange(event:Event):Void
+	private function onChange(event:Event):Void
 	{
 		_text = _tf.text;
 		event.stopImmediatePropagation();
@@ -172,14 +159,16 @@ class InputText extends Component
 	/**
 	 * Gets / sets the text shown in this InputText.
 	 */
-	public function setText(t:String):String
+	public var text(get_text, set_text):String;
+	
+	private function set_text(t:String):String
 	{
 		_text = t;
+		if(_text == null) _text = "";
 		invalidate();
 		return t;
 	}
-	
-	public function getText():String
+	private function get_text():String
 	{
 		return _text;
 	}
@@ -187,7 +176,9 @@ class InputText extends Component
 	/**
 	 * Returns a reference to the internal text field in the component.
 	 */
-	public function getTextField():TextField
+	public var textField(get_textField, null):TextField;
+	
+	private function get_textField():TextField
 	{
 		return _tf;
 	}
@@ -195,15 +186,16 @@ class InputText extends Component
 	/**
 	 * Gets / sets the list of characters that are allowed in this TextInput.
 	 */
-	public function setRestrict(str:String):String
+	public var restrict(get_restrict, set_restrict):String;
+	
+	private function set_restrict(str:String):String
 	{
 		#if flash
 		_tf.restrict = str;
 		#end
 		return str;
 	}
-	
-	public function getRestrict():String
+	private function get_restrict():String
 	{
 		#if flash
 		return _tf.restrict;
@@ -215,13 +207,14 @@ class InputText extends Component
 	/**
 	 * Gets / sets the maximum number of characters that can be shown in this InputText.
 	 */
-	public function setMaxChars(max:Int):Int
+	public var maxChars(get_maxChars, set_maxChars):Int;
+	
+	private function set_maxChars(max:Int):Int
 	{
 		_tf.maxChars = max;
 		return max;
 	}
-	
-	public function getMaxChars():Int
+	private function get_maxChars():Int
 	{
 		return _tf.maxChars;
 	}
@@ -229,13 +222,15 @@ class InputText extends Component
 	/**
 	 * Gets / sets whether or not this input text will show up as password (asterisks).
 	 */
-	public function setPassword(b:Bool):Bool
+	public var password(get_password, set_password):Bool;
+	
+	private function set_password(b:Bool):Bool
 	{
 		_password = b;
 		invalidate();
 		return b;
 	}
-	public function getPassword():Bool
+	private function get_password():Bool
 	{
 		return _password;
 	}
@@ -243,13 +238,12 @@ class InputText extends Component
 	/**
 	 * Sets/gets whether this component is enabled or not.
 	 */
-	override public function setEnabled(value:Bool):Bool
+	override private function set_enabled(value:Bool):Bool
 	{
-		super.setEnabled(value);
+		super.set_enabled(value);
 		#if flash
 		_tf.tabEnabled = value;
 		#end
 		return value;
 	}
-
 }

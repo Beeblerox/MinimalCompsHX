@@ -28,25 +28,18 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 
 class UISlider extends Component
 {
-	
-	public var value(getValue, setValue):Float;
-	public var maximum(getMaximum, setMaximum):Float;
-	public var minimum(getMinimum, setMinimum):Float;
-	public var labelPrecision(getLabelPrecision, setLabelPrecision):Int;
-	public var label(getLabel, setLabel):String;
-	public var tick(getTick, setTick):Float;
-	
-	var _label:Label;
-	var _valueLabel:Label;
-	var _slider:Slider;
-	var _precision:Int;
-	var _sliderClass:Class<Dynamic>;
-	var _labelText:String;
-	var _tick:Float;
+	private var _label:Label;
+	private var _valueLabel:Label;
+	private var _slider:Slider;
+	private var _precision:Int = 1;
+	private var _sliderClass:Class<Dynamic>;
+	private var _labelText:String;
+	private var _tick:Float = 1;
 	
 	
 	/**
@@ -57,11 +50,8 @@ class UISlider extends Component
 	 * @param label The initial string to display as this component's label.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, label:String = "", defaultHandler:Event->Void = null)
 	{
-		_precision = 1;
-		_tick = 1;
-		
 		_labelText = label;
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
@@ -74,10 +64,9 @@ class UISlider extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_label = new Label(this, 0, 0);
-		//_slider = new _sliderClass(this, 0, 0, onSliderChange);
 		_slider = Type.createInstance(_sliderClass, [this, 0, 0, onSliderChange]);
 		_valueLabel = new Label(this);
 	}
@@ -85,9 +74,9 @@ class UISlider extends Component
 	/**
 	 * Formats the value of the slider to a string based on the current level of precision.
 	 */
-	function formatValueLabel():Void
+	private function formatValueLabel():Void
 	{
-		if(Math.isNaN(_slider.value))
+		if (Math.isNaN(_slider.value))
 		{
 			_valueLabel.text = "NaN";
 			return;
@@ -95,18 +84,18 @@ class UISlider extends Component
 		var mult:Float = Math.pow(10, _precision);
 		var val:String = Std.string(Math.round(_slider.value * mult) / mult);
 		var parts:Array<String> = val.split(".");
-		if(parts[1] == null)
+		if (parts[1] == null)
 		{ 
-			if(_precision > 0)
+			if (_precision > 0)
 			{
 				val += ".";
 			}
-			for (i in 0..._precision)
+			for (i in 0...(_precision))
 			{
 				val += "0";
 			}
 		}
-		else if(parts[1].length < _precision)
+		else if (parts[1].length < _precision)
 		{
 			for (i in 0...(_precision - parts[1].length))
 			{
@@ -120,7 +109,7 @@ class UISlider extends Component
 	/**
 	 * Positions the label when it has changed. Implemented in child classes.
 	 */
-	function positionLabel():Void
+	private function positionLabel():Void
 	{
 		
 	}
@@ -165,7 +154,7 @@ class UISlider extends Component
 	 * Handler called when the slider's value changes.
 	 * @param event The Event passed by the slider.
 	 */
-	function onSliderChange(event:Event):Void
+	private function onSliderChange(event:Event):Void
 	{
 		formatValueLabel();
 		dispatchEvent(new Event(Event.CHANGE));
@@ -181,14 +170,15 @@ class UISlider extends Component
 	/**
 	 * Sets / gets the current value of this slider.
 	 */
-	public function setValue(v:Float):Float
+	public var value(get_value, set_value):Float;
+	
+	private function set_value(v:Float):Float
 	{
 		_slider.value = v;
 		formatValueLabel();
 		return v;
 	}
-	
-	public function getValue():Float
+	private function get_value():Float
 	{
 		return _slider.value;
 	}
@@ -196,13 +186,14 @@ class UISlider extends Component
 	/**
 	 * Gets / sets the maximum value of this slider.
 	 */
-	public function setMaximum(m:Float):Float
+	public var maximum(get_maximum, set_maximum):Float;
+	
+	private function set_maximum(m:Float):Float
 	{
 		_slider.maximum = m;
 		return m;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _slider.maximum;
 	}
@@ -210,13 +201,14 @@ class UISlider extends Component
 	/**
 	 * Gets / sets the minimum value of this slider.
 	 */
-	public function setMinimum(m:Float):Float
+	public var minimum(get_minimum, set_minimum):Float;
+	
+	private function set_minimum(m:Float):Float
 	{
 		_slider.minimum = m;
 		return m;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		return _slider.minimum;
 	}
@@ -224,13 +216,14 @@ class UISlider extends Component
 	/**
 	 * Gets / sets the number of decimals to format the value label. Does not affect the actual value of the slider, just the number shown.
 	 */
-	public function setLabelPrecision(decimals:Int):Int
+	public var labelPrecision(get_labelPrecision, set_labelPrecision):Int;
+	
+	private function set_labelPrecision(decimals:Int):Int
 	{
 		_precision = decimals;
 		return decimals;
 	}
-	
-	public function getLabelPrecision():Int
+	private function get_labelPrecision():Int
 	{
 		return _precision;
 	}
@@ -238,15 +231,16 @@ class UISlider extends Component
 	/**
 	 * Gets / sets the text shown in this component's label.
 	 */
-	public function setLabel(str:String):String
+	public var label(get_label, set_label):String;
+	
+	private function set_label(str:String):String
 	{
 		_labelText = str;
 //			invalidate();
 		draw();
 		return str;
 	}
-	
-	public function getLabel():String
+	private function get_label():String
 	{
 		return _labelText;
 	}
@@ -254,16 +248,16 @@ class UISlider extends Component
 	/**
 	 * Gets / sets the tick value of this slider. This round the value to the nearest multiple of this number. 
 	 */
-	public function setTick(t:Float):Float
+	public var tick(get_tick, set_tick):Float;
+	
+	private function set_tick(t:Float):Float
 	{
 		_tick = t;
 		_slider.tick = _tick;
 		return t;
 	}
-	
-	public function getTick():Float
+	private function get_tick():Float
 	{
 		return _tick;
-	}	
-
+	}
 }

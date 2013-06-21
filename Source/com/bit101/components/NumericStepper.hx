@@ -28,44 +28,34 @@
 
 package com.bit101.components;
 
-#if flash
-import flash.errors.Error;
-#end
-
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 import flash.events.MouseEvent;
-//import flash.events.TimerEvent;
-//import flash.utils.Timer;
-import haxe.Timer;
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
+enum NumericStepperDirection
+{
+	UP;
+	DOWN;
+}
 
 class NumericStepper extends Component
 {
-	
-	public var value(getValue, setValue):Float;
-	public var step(getStep, setStep):Int;
-	public var labelPrecision(getLabelPrecision, setLabelPrecision):Int;
-	public var maximum(getMaximum, setMaximum):Float;
-	public var minimum(getMinimum, setMinimum):Float;
-	public var repeatTime(getRepeatTime, setRepeatTime):Int;
-	
-	private var DELAY_TIME:Int;
-	private var UP:String;
-	private var DOWN:String;
-	var _minusBtn:PushButton;
+	private static inline var DELAY_TIME:Int = 500;
+	private var _minusBtn:PushButton;
 
-	var _repeatTime:Int;
-	var _plusBtn:PushButton;
-	var _valueText:InputText;
-	var _value:Float;
-	var _step:Int;
-	var _labelPrecision:Int;
-	var _maximum:Float;
-	var _minimum:Float;
-	var _delayTimer:Timer;
-	var _repeatTimer:Timer;
-	var _direction:String;
-	var _numRepeats:Int;
-	var _isRepeatTimerRunning:Bool;
+	private var _repeatTime:Int = 100;
+	private var _plusBtn:PushButton;
+	private var _valueText:InputText;
+	private var _value:Float = 0;
+	private var _step:Float = 1;
+	private var _labelPrecision:Int = 1;
+	private var _maximum:Float;
+	private var _minimum:Float;
+	private var _delayTimer:Timer;
+	private var _repeatTimer:Timer;
+	private var _direction:NumericStepperDirection;
 	
 	/**
 	 * Constructor
@@ -74,21 +64,10 @@ class NumericStepper extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, defaultHandler:Event->Void = null)
 	{
-		DELAY_TIME = 500;
-		UP = "up";
-		DOWN = "down";
-		
-		_repeatTime = 100;
-		_value = 0;
-		_step = 1;
-		_labelPrecision = 1;
 		_maximum = Math.POSITIVE_INFINITY;
 		_minimum = Math.NEGATIVE_INFINITY;
-		
-		_isRepeatTimerRunning = false;
-		
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -99,20 +78,20 @@ class NumericStepper extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	private override function init():Void
 	{
 		super.init();
 		setSize(80, 16);
-		//_delayTimer = new Timer(DELAY_TIME, 1);
-		//_delayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onDelayComplete);
-		//_repeatTimer = new Timer(_repeatTime);
-		//_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
+		_delayTimer = new Timer(DELAY_TIME, 1);
+		_delayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onDelayComplete);
+		_repeatTimer = new Timer(_repeatTime);
+		_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
 	}
 	
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		_valueText = new InputText(this, 0, 0, "0", onValueTextChange);
 		_valueText.restrict = "-0123456789.";
@@ -124,7 +103,7 @@ class NumericStepper extends Component
 		_plusBtn.setSize(16, 16);
 	}
 	
-	function increment():Void
+	private function increment():Void
 	{
 		if(_value + _step <= _maximum)
 		{
@@ -134,7 +113,7 @@ class NumericStepper extends Component
 		}
 	}
 	
-	function decrement():Void
+	private function decrement():Void
 	{
 		if(_value - _step >= _minimum)
 		{
@@ -174,37 +153,35 @@ class NumericStepper extends Component
 	/**
 	 * Called when the minus button is pressed. Decrements the value by the step amount.
 	 */
-	function onMinus(event:MouseEvent):Void
+	private function onMinus(event:MouseEvent):Void
 	{
 		decrement();
-		_direction = DOWN;
-		_delayTimer = Timer.delay(onDelayComplete, DELAY_TIME);
-		//_delayTimer.start();
+		_direction = NumericStepperDirection.DOWN;
+		_delayTimer.start();
 		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
 	/**
 	 * Called when the plus button is pressed. Increments the value by the step amount.
 	 */
-	function onPlus(event:MouseEvent):Void
+	private function onPlus(event:MouseEvent):Void
 	{
 		increment();
-		_direction = UP;
-		_delayTimer = Timer.delay(onDelayComplete, DELAY_TIME);
+		_direction = NumericStepperDirection.UP;
+		_delayTimer.start();
 		stage.addEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
 	}
 	
-	function onMouseGoUp(event:MouseEvent):Void
+	private function onMouseGoUp(event:MouseEvent):Void
 	{
-		if (_delayTimer != null) _delayTimer.stop();
-		if (_repeatTimer != null) _repeatTimer.stop();
-		_isRepeatTimerRunning = false;
+		_delayTimer.stop();
+		_repeatTimer.stop();
 	}
 	
 	/**
 	 * Called when the value is changed manually.
 	 */
-	function onValueTextChange(event:Event):Void
+	private function onValueTextChange(event:Event):Void
 	{
 		event.stopImmediatePropagation();
 		var newVal:Float = Std.parseFloat(_valueText.text);
@@ -216,21 +193,14 @@ class NumericStepper extends Component
 		}
 	}
 
-	function onDelayComplete(/*event:TimerEvent*/):Void
+	private function onDelayComplete(event:TimerEvent):Void
 	{
-		if (_repeatTimer != null)
-		{
-			_repeatTimer.stop();
-		}
-		_repeatTimer = new Timer(_repeatTime);
-		_repeatTimer.run = onRepeat;
-		_isRepeatTimerRunning = true;
-		//_repeatTimer.start();
+		_repeatTimer.start();
 	}
 
-	function onRepeat(/*event:TimerEvent*/):Void
+	private function onRepeat(event:TimerEvent):Void
 	{
-		if(_direction == UP)
+		if(_direction == NumericStepperDirection.UP)
 		{
 			increment();
 		}
@@ -249,7 +219,9 @@ class NumericStepper extends Component
 	/**
 	 * Sets / gets the current value of this component.
 	 */
-	public function setValue(val:Float):Float
+	public var value(get, set):Float;
+	
+	private function set_value(val:Float):Float
 	{
 		if(val <= _maximum && val >= _minimum)
 		{
@@ -258,8 +230,7 @@ class NumericStepper extends Component
 		}
 		return val;
 	}
-	
-	public function getValue():Float
+	private function get_value():Float
 	{
 		return _value;
 	}
@@ -267,21 +238,18 @@ class NumericStepper extends Component
 	/**
 	 * Sets / gets the amount the value will change when the up or down button is pressed. Must be zero or positive.
 	 */
-	public function setStep(value:Int):Int
+	public var step(get, set):Float;
+	
+	private function set_step(value:Float):Float
 	{
 		if(value < 0) 
 		{
-			#if flash
-			throw new Error("NumericStepper step must be positive.");
-			#else
 			throw "NumericStepper step must be positive.";
-			#end
 		}
 		_step = value;
 		return value;
 	}
-	
-	public function getStep():Int
+	private function get_step():Float
 	{
 		return _step;
 	}
@@ -289,14 +257,15 @@ class NumericStepper extends Component
 	/**
 	 * Sets / gets how many decimal points of precision will be shown.
 	 */
-	public function setLabelPrecision(value:Int):Int
+	public var labelPrecision(get, set):Int;
+	
+	private function set_labelPrecision(value:Int):Int
 	{
 		_labelPrecision = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getLabelPrecision():Int
+	private function get_labelPrecision():Int
 	{
 		return _labelPrecision;
 	}
@@ -304,7 +273,9 @@ class NumericStepper extends Component
 	/**
 	 * Sets / gets the maximum value for this component.
 	 */
-	public function setMaximum(value:Float):Float
+	public var maximum(get, set):Float;
+	
+	private function set_maximum(value:Float):Float
 	{
 		_maximum = value;
 		if(_value > _maximum)
@@ -314,8 +285,7 @@ class NumericStepper extends Component
 		}
 		return value;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _maximum;
 	}
@@ -323,7 +293,9 @@ class NumericStepper extends Component
 	/**
 	 * Sets / gets the maximum value for this component.
 	 */
-	public function setMinimum(value:Float):Float
+	public var minimum(get, set):Float;
+	
+	private function set_minimum(value:Float):Float
 	{
 		_minimum = value;
 		if(_value < _minimum)
@@ -333,8 +305,7 @@ class NumericStepper extends Component
 		}
 		return value;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		return _minimum;
 	}
@@ -342,22 +313,18 @@ class NumericStepper extends Component
 	/**
 	 * Gets/sets the update rate that the stepper will change its value if a button is held down.
 	 */
-	public function getRepeatTime():Int
+	public var repeatTime(get, set):Int;
+	
+	private function get_repeatTime():Int
 	{
 		return _repeatTime;
 	}
 
-	public function setRepeatTime(value:Int):Int
+	private function set_repeatTime(value:Int):Int
 	{
 		// shouldn't be any need to set it faster than 10 ms. guard against negative.
 		_repeatTime = Std.int(Math.max(value, 10));
-		if (_isRepeatTimerRunning)
-		{
-			_repeatTimer.stop();
-			_repeatTimer = new Timer(_repeatTime);
-			_repeatTimer.run = onRepeat;
-		}
-		//_repeatTimer.delay = _repeatTime;
+		_repeatTimer.delay = _repeatTime;
 		return value;
 	}
 }

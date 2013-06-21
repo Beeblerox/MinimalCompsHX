@@ -28,47 +28,50 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Rectangle;
 
+enum RangeSliderOrientation
+{
+	VERTICAL;
+	HORIZONTAL;
+}
+
+enum RangeSliderLabelMode
+{
+	ALWAYS;
+	MOVE;
+}
+
+enum RangeSliderLabelPosition
+{
+	BOTTOM;
+	LEFT;
+	RIGHT;
+	TOP;
+}
+
 class RangeSlider extends Component
 {
+	private var _back:Sprite;
+	private var _highLabel:Label;
+	private var _highValue:Float = 100;
+	private var _labelMode:RangeSliderLabelMode;
+	private var _labelPosition:RangeSliderLabelPosition;
+	private var _labelPrecision:Int = 0;
+	private var _lowLabel:Label;
+	private var _lowValue:Float = 0;
+	private var _maximum:Float = 100;
+	private var _maxHandle:Sprite;
+	private var _minimum:Float = 0;
+	private var _minHandle:Sprite;
+	private var _orientation:RangeSliderOrientation;
+	private var _tick:Float = 1;
 	
-	public var minimum(getMinimum, setMinimum):Float;
-	public var maximum(getMaximum, setMaximum):Float;
-	public var lowValue(getLowValue, setLowValue):Float;
-	public var highValue(getHighValue, setHighValue):Float;
-	public var labelMode(getLabelMode, setLabelMode):String;
-	public var labelPosition(getLabelPosition, setLabelPosition):String;
-	public var labelPrecision(getLabelPrecision, setLabelPrecision):Int;
-	public var tick(getTick, setTick):Float;
-	
-	var _back:Sprite;
-	var _highLabel:Label;
-	var _highValue:Float;
-	var _labelMode:String;
-	var _labelPosition:String;
-	var _labelPrecision:Int;
-	var _lowLabel:Label;
-	var _lowValue:Float;
-	var _maximum:Float;
-	var _maxHandle:Sprite;
-	var _minimum:Float;
-	var _minHandle:Sprite;
-	var _orientation:String;
-	var _tick:Float;
-	
-	public static inline var ALWAYS:String = "always";
-	public static inline var BOTTOM:String = "bottom";
-	public static inline var HORIZONTAL:String = "horizontal";
-	public static inline var LEFT:String = "left";
-	public static inline var MOVE:String = "move";
 	public static inline var NEVER:String = "never";
-	public static inline var RIGHT:String = "right";
-	public static inline var TOP:String = "top";
-	public static inline var VERTICAL:String = "vertical";
 	
 	
 	
@@ -80,18 +83,17 @@ class RangeSlider extends Component
 	 * @param ypos The y position to place this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(orientation:String, ?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic->Void = null)
+	public function new(orientation:RangeSliderOrientation, parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, defaultHandler:Event->Void = null)
 	{
-		_highValue = 100;
-		_labelMode = ALWAYS;
-		_labelPrecision = 0;
-		_lowValue = 0;
-		_maximum = 100;
-		_minimum = 0;
-		_orientation = VERTICAL;
-		_tick = 1;
-		
-		_orientation = orientation;
+		if (orientation == null)
+		{
+			_orientation = RangeSliderOrientation.VERTICAL;
+		}
+		else
+		{
+			_orientation = orientation;
+		}
+		_labelMode = RangeSliderLabelMode.ALWAYS;
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -102,10 +104,10 @@ class RangeSlider extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			setSize(110, 10);
 			_labelPosition = TOP;
@@ -120,7 +122,7 @@ class RangeSlider extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		super.addChildren();
 		_back = new Sprite();
@@ -134,10 +136,8 @@ class RangeSlider extends Component
 		_minHandle.filters = [getShadow(1)];
 		#end
 		_minHandle.addEventListener(MouseEvent.MOUSE_DOWN, onDragMin);
-		
 		_minHandle.buttonMode = true;
 		_minHandle.useHandCursor = true;
-		
 		addChild(_minHandle);
 		
 		_maxHandle = new Sprite();
@@ -145,10 +145,8 @@ class RangeSlider extends Component
 		_maxHandle.filters = [getShadow(1)];
 		#end
 		_maxHandle.addEventListener(MouseEvent.MOUSE_DOWN, onDragMax);
-		
 		_maxHandle.buttonMode = true;
 		_maxHandle.useHandCursor = true;
-		
 		addChild(_maxHandle);			
 		
 		_lowLabel = new Label(this);
@@ -159,7 +157,7 @@ class RangeSlider extends Component
 	/**
 	 * Draws the back of the slider.
 	 */
-	function drawBack():Void
+	private function drawBack():Void
 	{
 		_back.graphics.clear();
 		_back.graphics.beginFill(Style.BACKGROUND);
@@ -170,13 +168,13 @@ class RangeSlider extends Component
 	/**
 	 * Draws the handles of the slider.
 	 */
-	function drawHandles():Void
+	private function drawHandles():Void
 	{	
 		_minHandle.graphics.clear();
 		_minHandle.graphics.beginFill(Style.BUTTON_FACE);
 		_maxHandle.graphics.clear();
 		_maxHandle.graphics.beginFill(Style.BUTTON_FACE);
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			_minHandle.graphics.drawRect(1, 1, _height - 2, _height - 2);
 			_maxHandle.graphics.drawRect(1, 1, _height - 2, _height - 2);
@@ -194,10 +192,10 @@ class RangeSlider extends Component
 	 * Adjusts positions of handles when value, maximum or minimum have changed.
 	 * TODO: Should also be called when slider is resized.
 	 */
-	function positionHandles():Void
+	private function positionHandles():Void
 	{
 		var range:Float;
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			range = _width - _height * 2;
 			_minHandle.x = (_lowValue - _minimum) / (_maximum - _minimum) * range;
@@ -215,14 +213,14 @@ class RangeSlider extends Component
 	/**
 	 * Sets the text and positions the labels.
 	 */
-	function updateLabels():Void
+	private function updateLabels():Void
 	{
 		_lowLabel.text = getLabelForValue(lowValue);
 		_highLabel.text = getLabelForValue(highValue);
 		_lowLabel.draw();
 		_highLabel.draw();
 
-		if(_orientation == VERTICAL)
+		if(_orientation == RangeSliderOrientation.VERTICAL)
 		{
 			_lowLabel.y = _minHandle.y + (_width - _lowLabel.height) * 0.5;
 			_highLabel.y = _maxHandle.y + (_width - _highLabel.height) * 0.5;
@@ -259,17 +257,15 @@ class RangeSlider extends Component
 	 * Generates a label string for the given value.
 	 * @param value The number to create a label for.
 	 */
-	function getLabelForValue(value:Float):String
+	private function getLabelForValue(value:Float):String
 	{
 		var str:String = Std.string(Math.round(value * Math.pow(10, _labelPrecision)) / Math.pow(10, _labelPrecision));
 		if(_labelPrecision > 0)
 		{
-			//var decimal:String = str.split(".")[1] || "";
 			var decimal:String = "";
-			if (str.split(".").length == 2) decimal = str.split(".")[1];
-			//	
-			if (decimal.length == 0) str += ".";
-			for (i in decimal.length..._labelPrecision)
+			if (str.split(".").length > 1) decimal = str.split(".")[1];
+			if(decimal.length == 0) str += ".";
+			for(i in (decimal.length)...(_labelPrecision))
 			{
 				str += "0";
 			}
@@ -303,11 +299,11 @@ class RangeSlider extends Component
 	 * Internal mouseDown handler for the low value handle. Starts dragging the handle.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onDragMin(event:MouseEvent):Void
+	private function onDragMin(event:MouseEvent):Void
 	{
 		stage.addEventListener(MouseEvent.MOUSE_UP, onDrop);
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, onMinSlide);
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			_minHandle.startDrag(false, new Rectangle(0, 0, _maxHandle.x - _height, 0));
 		}
@@ -326,11 +322,11 @@ class RangeSlider extends Component
 	 * Internal mouseDown handler for the high value handle. Starts dragging the handle.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onDragMax(event:MouseEvent):Void
+	private function onDragMax(event:MouseEvent):Void
 	{
 		stage.addEventListener(MouseEvent.MOUSE_UP, onDrop);
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, onMaxSlide);
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			_maxHandle.startDrag(false, new Rectangle(_minHandle.x + _height, 0, _width - _height - _minHandle.x - _height, 0));
 		}
@@ -349,13 +345,13 @@ class RangeSlider extends Component
 	 * Internal mouseUp handler. Stops dragging the handle.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onDrop(event:MouseEvent):Void
+	private function onDrop(event:MouseEvent):Void
 	{
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onDrop);
 		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMinSlide);
 		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMaxSlide);
 		stopDrag();
-		if(_labelMode == MOVE)
+		if(_labelMode == RangeSliderLabelMode.MOVE)
 		{
 			_lowLabel.visible = false;
 			_highLabel.visible = false;
@@ -366,10 +362,10 @@ class RangeSlider extends Component
 	 * Internal mouseMove handler for when the low value handle is being moved.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onMinSlide(event:MouseEvent):Void
+	private function onMinSlide(event:MouseEvent):Void
 	{
 		var oldValue:Float = _lowValue;
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			_lowValue = _minHandle.x / (_width - _height * 2) * (_maximum - _minimum) + _minimum;
 		}
@@ -388,10 +384,10 @@ class RangeSlider extends Component
 	 * Internal mouseMove handler for when the high value handle is being moved.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onMaxSlide(event:MouseEvent):Void
+	private function onMaxSlide(event:MouseEvent):Void
 	{
 		var oldValue:Float = _highValue;
-		if(_orientation == HORIZONTAL)
+		if(_orientation == RangeSliderOrientation.HORIZONTAL)
 		{
 			_highValue = (_maxHandle.x - _height) / (_width - _height * 2) * (_maximum - _minimum) + _minimum;
 		}
@@ -409,7 +405,9 @@ class RangeSlider extends Component
 	/**
 	 * Gets / sets the minimum value of the slider.
 	 */
-	public function setMinimum(value:Float):Float
+	public var minimum(get_minimum, set_minimum):Float;
+	
+	private function set_minimum(value:Float):Float
 	{
 		_minimum = value;
 		_maximum = Math.max(_maximum, _minimum);
@@ -418,8 +416,7 @@ class RangeSlider extends Component
 		positionHandles();
 		return value;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		return _minimum;
 	}
@@ -427,7 +424,9 @@ class RangeSlider extends Component
 	/**
 	 * Gets / sets the maximum value of the slider.
 	 */
-	public function setMaximum(value:Float):Float
+	public var maximum(get_maximum, set_maximum):Float;
+	
+	private function set_maximum(value:Float):Float
 	{
 		_maximum = value;
 		_minimum = Math.min(_minimum, _maximum);
@@ -436,8 +435,7 @@ class RangeSlider extends Component
 		positionHandles();
 		return value;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _maximum;
 	}
@@ -445,7 +443,9 @@ class RangeSlider extends Component
 	/**
 	 * Gets / sets the low value of this slider.
 	 */
-	public function setLowValue(value:Float):Float
+	public var lowValue(get_lowValue, set_lowValue):Float;
+	
+	private function set_lowValue(value:Float):Float
 	{
 		_lowValue = value;
 		_lowValue = Math.min(_lowValue, _highValue);
@@ -454,8 +454,7 @@ class RangeSlider extends Component
 		dispatchEvent(new Event(Event.CHANGE));
 		return value;
 	}
-	
-	public function getLowValue():Float
+	private function get_lowValue():Float
 	{
 		return Math.round(_lowValue / _tick) * _tick;
 	}
@@ -463,7 +462,9 @@ class RangeSlider extends Component
 	/**
 	 * Gets / sets the high value for this slider.
 	 */
-	public function setHighValue(value:Float):Float
+	public var highValue(get_highValue, set_highValue):Float;
+	
+	private function set_highValue(value:Float):Float
 	{
 		_highValue = value;
 		_highValue = Math.max(_highValue, _lowValue);
@@ -472,8 +473,7 @@ class RangeSlider extends Component
 		dispatchEvent(new Event(Event.CHANGE));
 		return value;
 	}
-	
-	public function getHighValue():Float
+	private function get_highValue():Float
 	{
 		return Math.round(_highValue / _tick) * _tick;
 	}
@@ -481,15 +481,16 @@ class RangeSlider extends Component
 	/**
 	 * Sets / gets when the labels will appear. Can be "never", "move", or "always"
 	 */
-	public function setLabelMode(value:String):String
+	public var labelMode(get_labelMode, set_labelMode):RangeSliderLabelMode;
+	
+	private function set_labelMode(value:RangeSliderLabelMode):RangeSliderLabelMode
 	{
 		_labelMode = value;
-		_highLabel.visible = (_labelMode == ALWAYS);
-		_lowLabel.visible = (_labelMode == ALWAYS);
+		_highLabel.visible = (_labelMode == RangeSliderLabelMode.ALWAYS);
+		_lowLabel.visible = (_labelMode == RangeSliderLabelMode.ALWAYS);
 		return value;
 	}
-	
-	public function getLabelMode():String
+	private function get_labelMode():RangeSliderLabelMode
 	{
 		return _labelMode;
 	}
@@ -497,14 +498,15 @@ class RangeSlider extends Component
 	/**
 	 * Sets / gets where the labels will appear. "left" or "right" for vertical sliders, "top" or "bottom" for horizontal.
 	 */
-	public function setLabelPosition(value:String):String
+	public var labelPosition(get_labelPosition, set_labelPosition):RangeSliderLabelPosition;
+	
+	private function set_labelPosition(value:RangeSliderLabelPosition):RangeSliderLabelPosition
 	{
 		_labelPosition = value;
 		updateLabels();
 		return value;
 	}
-	
-	public function getLabelPosition():String
+	private function get_labelPosition():RangeSliderLabelPosition
 	{
 		return _labelPosition;
 	}
@@ -512,14 +514,15 @@ class RangeSlider extends Component
 	/**
 	 * Sets / gets how many decimal points of precisions will be displayed on the labels.
 	 */
-	public function setLabelPrecision(value:Int):Int
+	public var labelPrecision(get_labelPrecision, set_labelPrecision):Int;
+	
+	private function set_labelPrecision(value:Int):Int
 	{
 		_labelPrecision = value;
 		updateLabels();
 		return value;
 	}
-	
-	public function getLabelPrecision():Int
+	private function get_labelPrecision():Int
 	{
 		return _labelPrecision;
 	}
@@ -527,16 +530,16 @@ class RangeSlider extends Component
 	/**
 	 * Gets / sets the tick value of this slider. This round the value to the nearest multiple of this number. 
 	 */
-	public function setTick(value:Float):Float
+	public var tick(get_tick, set_tick):Float;
+	
+	private function set_tick(value:Float):Float
 	{
 		_tick = value;
 		updateLabels();
 		return value;
 	}
-	
-	public function getTick():Float
+	private function get_tick():Float
 	{
 		return _tick;
 	}
-
 }

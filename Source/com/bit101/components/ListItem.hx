@@ -29,10 +29,18 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
+import flash.events.MouseEvent;
 
-class ListItem extends ViewItem
+class ListItem extends Component
 {
-	var _label:Label;
+	private var _data:Dynamic;
+	private var _label:Label;
+	private var _defaultColor:Int = 0xffffff;
+	private var _selectedColor:Int = 0xdddddd;
+	private var _rolloverColor:Int = 0xeeeeee;
+	private var _selected:Bool;
+	private var _mouseOver:Bool = false;
 	
 	/**
 	 * Constructor
@@ -41,16 +49,26 @@ class ListItem extends ViewItem
 	 * @param ypos The y position to place this component.
 	 * @param data The string to display as a label or object with a label property.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?data:Dynamic = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, data:Dynamic = null)
 	{
-		super(parent, xpos, ypos, data);
+		_data = data;
+		super(parent, xpos, ypos);
 	}
 	
+	/**
+	 * Initilizes the component.
+	 */
+	private override function init():Void
+	{
+		super.init();
+		addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+		setSize(100, 20);
+	}
 	
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		super.addChildren();
 		_label = new Label(this, 5, 0);
@@ -62,19 +80,37 @@ class ListItem extends ViewItem
 	///////////////////////////////////
 	
 	/**
-	 * Draws the data.
+	 * Draws the visual ui of the component.
 	 */
-	public override function drawData () : Void
+	public override function draw():Void
 	{
-    super.drawData ();
+		super.draw();
+		graphics.clear();
+
+		if(_selected)
+		{
+			graphics.beginFill(_selectedColor);
+		}
+		else if(_mouseOver)
+		{
+			graphics.beginFill(_rolloverColor);
+		}
+		else
+		{
+			graphics.beginFill(_defaultColor);
+		}
+		graphics.drawRect(0, 0, width, height);
+		graphics.endFill();
+
+		if(_data == null) return;
 
 		if(Std.is(_data, String))
 		{
-			_label.text = Std.string(_data);
+			_label.text = cast(_data, String);
 		}
 		else if(Reflect.hasField(_data, "label") && Std.is(Reflect.field(_data, "label"), String))
 		{
-			_label.text = Reflect.field(_data, "label");// _data.label;
+			_label.text = _data.label;
 		}
 		else
 		{
@@ -82,5 +118,116 @@ class ListItem extends ViewItem
 		}
 	}
 	
+	
+	
+	
+	///////////////////////////////////
+	// event handlers
+	///////////////////////////////////
+	
+	/**
+	 * Called when the user rolls the mouse over the item. Changes the background color.
+	 */
+	private function onMouseOver(event:MouseEvent):Void
+	{
+		addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+		_mouseOver = true;
+		invalidate();
+	}
+	
+	/**
+	 * Called when the user rolls the mouse off the item. Changes the background color.
+	 */
+	private function onMouseOut(event:MouseEvent):Void
+	{
+		removeEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+		_mouseOver = false;
+		invalidate();
+	}
+	
+	
+	
+	///////////////////////////////////
+	// getter/setters
+	///////////////////////////////////
+	
+	/**
+	 * Sets/gets the string that appears in this item.
+	 */
+	public var data(get, set):Dynamic;
+	
+	private function set_data(value:Dynamic):Dynamic
+	{
+		_data = value;
+		invalidate();
+		return value;
+	}
+	private function get_data():Dynamic
+	{
+		return _data;
+	}
+	
+	/**
+	 * Sets/gets whether or not this item is selected.
+	 */
+	public var selected(get, set):Bool;
+	
+	private function set_selected(value:Bool):Bool
+	{
+		_selected = value;
+		invalidate();
+		return value;
+	}
+	private function get_selected():Bool
+	{
+		return _selected;
+	}
+	
+	/**
+	 * Sets/gets the default background color of list items.
+	 */
+	public var defaultColor(get, set):Int;
+	
+	private function set_defaultColor(value:Int):Int
+	{
+		_defaultColor = value;
+		invalidate();
+		return value;
+	}
+	private function get_defaultColor():Int
+	{
+		return _defaultColor;
+	}
+	
+	/**
+	 * Sets/gets the selected background color of list items.
+	 */
+	public var selectedColor(get, set):Int;
+	
+	private function set_selectedColor(value:Int):Int
+	{
+		_selectedColor = value;
+		invalidate();
+		return value;
+	}
+	private function get_selectedColor():Int
+	{
+		return _selectedColor;
+	}
+	
+	/**
+	 * Sets/gets the rollover background color of list items.
+	 */
+	public var rolloverColor(get, set):Int;
+	
+	private function set_rolloverColor(value:Int):Int
+	{
+		_rolloverColor = value;
+		invalidate();
+		return value;
+	}
+	private function get_rolloverColor():Int
+	{
+		return _rolloverColor;
+	}	
 }
-

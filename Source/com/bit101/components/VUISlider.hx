@@ -28,12 +28,11 @@
 
 package com.bit101.components;
 
-import nme.events.Event;
+import flash.display.DisplayObjectContainer;
+import flash.events.Event;
 
 class VUISlider extends UISlider
 {
-	
-	
 	/**
 	 * Constructor
 	 * @param parent The parent DisplayObjectContainer on which to add this VUISlider.
@@ -42,7 +41,7 @@ class VUISlider extends UISlider
 	 * @param label The string to use as the label for this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, label:String = "", defaultHandler:Event->Void = null)
 	{
 		_sliderClass = VSlider;
 		super(parent, xpos, ypos, label, defaultHandler);
@@ -51,7 +50,7 @@ class VUISlider extends UISlider
 	/**
 	 * Initializes this component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		setSize(20, 146);
@@ -77,7 +76,7 @@ class VUISlider extends UISlider
 		_valueLabel.y = _slider.y + _slider.height + 5;
 	}
 	
-	override function positionLabel():Void
+	override private function positionLabel():Void
 	{
 		_valueLabel.x = width / 2 - _valueLabel.width / 2;
 	}
@@ -93,9 +92,13 @@ class VUISlider extends UISlider
 	// getter/setters
 	///////////////////////////////////
 	
-	override public function getWidth():Float
+	#if !flash
+	override function get_width():Float
+	#else
+	@:getter(width) override function get_width():Float
+	#end
 	{
-		if (_label == null) return _width;
+		if(_label == null) return _width;
 		return Math.max(_width, _label.width);
 	}
 	

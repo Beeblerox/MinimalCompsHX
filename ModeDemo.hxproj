@@ -2,46 +2,51 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="CustomBuild" />
+    <movie outputType="Application" />
     <movie input="" />
-    <movie path="" />
+    <movie path="ModeDemo.xml" />
     <movie fps="30" />
-    <movie width="800" />
-    <movie height="600" />
-    <movie version="1" />
+    <movie width="640" />
+    <movie height="480" />
+    <movie version="3" />
     <movie minorVersion="0" />
-    <movie platform="C++" />
-    <movie background="#FFFFFF" />
+    <movie platform="NME" />
+    <movie background="000000" />
+    <movie preferredSDK="Haxe 3.0.0;3.0.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="Source" />
+    <class path="source" />
+    <class path="C:\HaxeToolkit\haxe\lib\openfl/1,0,1/" />
+    <class path="bin/windows/neko/haxe" />
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="" />
+    <option directives="nme4=1&#xA;tools=1&#xA;nme_ver=4.0.2&#xA;nme&#xA;nme_install_tool=1&#xA;display&#xA;windows&#xA;desktop" />
     <option flashStrict="False" />
-    <option mainClass="Minimalcompshx" />
+    <option mainClass="ApplicationMain" />
     <option enabledebug="False" />
-    <option additional="" />
+    <option additional="--no-output&#xA;--macro allowPackage(&quot;flash&quot;)" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <library name="nme" />
-    <library name="actuate" />
+    <library name="openfl" />
+    <library name="flixel" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <!-- example: <compile path="..." /> -->
+    <compile path="Source\ProjectClass.hx" />
   </compileTargets>
+  <!-- Assets to embed into the output SWF -->
+  <library>
+    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
+  </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <!-- example: <hidden path="..." /> -->
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>haxelib run nme test "Minimalcompshx.nmml" cpp
-haxelib run nme test "Minimalcompshx.nmml" flash
-haxelib run nme test "Minimalcompshx.nmml" html5</preBuildCommand>
+  <preBuildCommand />
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

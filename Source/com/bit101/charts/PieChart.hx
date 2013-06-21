@@ -29,6 +29,8 @@
 package com.bit101.charts;
 
 import com.bit101.components.Label;
+
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 
 /**
@@ -42,14 +44,9 @@ import flash.display.Sprite;
  */
 class PieChart extends Chart
 {
-	
-	public var colors(getColors, setColors):Array<Int>;
-	public var beginningAngle(getBeginningAngle, setBeginningAngle):Float;
-	
-	var _sprite:Sprite;
-	var _beginningAngle:Float;
-	var _colors:Array<Int>;
-	
+	private var _sprite:Sprite;
+	private var _beginningAngle:Float = 0;
+	private var _colors:Array<Int>;
 	
 	/**
 	 * Constructor
@@ -58,9 +55,8 @@ class PieChart extends Chart
 	 * @param ypos The y position to place this component.
 	 * @param data The array of numeric values or objects to graph.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?data:Array<Dynamic> = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, data:Array<Dynamic> = null)
 	{
-		_beginningAngle = 0;
 		_colors = [
 			0xff9999, 0xffff99, 0x99ff99, 0x99ffff, 0x9999ff, 0xff99ff,
 			0xffcccc, 0xffffcc, 0xccffcc, 0xccffff, 0xccccff, 0xffccff,
@@ -74,7 +70,7 @@ class PieChart extends Chart
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	private override function init():Void
 	{
 		super.init();
 		setSize(160, 120);
@@ -83,7 +79,7 @@ class PieChart extends Chart
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		super.addChildren();
 		_sprite = new Sprite();
@@ -93,7 +89,7 @@ class PieChart extends Chart
 	/**
 	 * Graphs the numeric data in the chart.
 	 */
-	override function drawChart():Void
+	private override function drawChart():Void
 	{
 		var radius:Float = Math.min(width - 40, height - 40) / 2;
 		_sprite.x = width / 2;
@@ -104,7 +100,7 @@ class PieChart extends Chart
 		
 		var total:Float = getDataTotal();			
 		var startAngle:Float = _beginningAngle * Math.PI / 180;
-		for (i in 0..._data.length)
+		for(i in 0...(_data.length))
 		{
 			var percent:Float = getValueForData(i) / total;
 			var endAngle:Float = startAngle + Math.PI * 2 * percent;
@@ -120,7 +116,7 @@ class PieChart extends Chart
 	 * @property radius The distance from the center to position this label.
 	 * @property text The text of the label.
 	 */ 
-	function makeLabel(angle:Float, radius:Float, text:String):Void
+	private function makeLabel(angle:Float, radius:Float, text:String):Void
 	{
 		var label:Label = new Label(_sprite, 0, 0, text);
 		label.x = Math.cos(angle) * radius;
@@ -138,33 +134,30 @@ class PieChart extends Chart
 	 * @property radius The radius of the arc.
 	 * @property color The color to draw the arc.
 	 */
-	function drawArc(startAngle:Float, endAngle:Float, radius:Float, color:Int):Void
+	private function drawArc(startAngle:Float, endAngle:Float, radius:Float, color:Int):Void
 	{
-		if (color >= 0)
+		_sprite.graphics.beginFill(color);
+		_sprite.graphics.moveTo(0, 0);
+		var i:Float = startAngle;
+		while (i < endAngle)
 		{
-			_sprite.graphics.beginFill(color);
-			_sprite.graphics.moveTo(0, 0);
-			var i:Float = startAngle;
-			while (i < endAngle)
-			{
-				_sprite.graphics.lineTo(Math.cos(i) * radius, Math.sin(i) * radius);
-				i += .01;
-			}
-			_sprite.graphics.lineTo(Math.cos(endAngle) * radius, Math.sin(endAngle) * radius);
-			_sprite.graphics.lineTo(0, 0);
-			_sprite.graphics.endFill();
+			_sprite.graphics.lineTo(Math.cos(i) * radius, Math.sin(i) * radius);
+			i += .01;
 		}
+		_sprite.graphics.lineTo(Math.cos(endAngle) * radius, Math.sin(endAngle) * radius);
+		_sprite.graphics.lineTo(0, 0);
+		_sprite.graphics.endFill();
 	}
 	
 	/**
 	 * Determines what label to use for the specified data.
 	 * @property index The index of the data to get the label for.
 	 */
-	function getLabelForData(index:Int):String
+	private function getLabelForData(index:Int):String
 	{
-		if(!Std.is(_data[index], Float) && Reflect.hasField(_data[index], "label"))
+		if(!Std.is(_data[index], Float) && _data[index].label != null)
 		{
-			return Std.string(Reflect.field(_data[index], "label"));
+			return _data[index].label;
 		}
 		var value:Float = Math.round(getValueForData(index) * Math.pow(10, _labelPrecision)) / Math.pow(10, _labelPrecision);
 		return Std.string(value);
@@ -174,32 +167,32 @@ class PieChart extends Chart
 	 * Determines what color to use for the specified data.
 	 * @property index The index of the data to get the color for.
 	 */
-	function getColorForData(index:Int):Int
+	private function getColorForData(index:Int):Int
 	{
-		if(Math.isNaN(_data[index]) && Reflect.hasField(_data[index], "color"))
+		if(!Std.is(_data[index], Float) && _data[index].color != null)
 		{
-			return cast(Reflect.field(_data[index], "color"), Int);
+			return _data[index].color;
 		}
 		if(index < _colors.length)
 		{
 			return _colors[index];
 		}
-		return cast(Std.int(Math.random() * 0xffffff), Int);
+		return Std.int(Math.random() * 0xffffff);
 	}
 	
 	/**
 	 * Determines what value to use for the specified data.
 	 * @property index The index of the data to get the value for.
 	 */
-	function getValueForData(index:Int):Float
+	private function getValueForData(index:Int):Float
 	{
-		if (Std.is(_data[index], Float))
+		if(Std.is(_data[index], Float))
 		{
 			return _data[index];
 		}
-		if (Reflect.hasField(_data[index], "value") && Std.is(Reflect.field(_data[index], "value"), Float))
+		if(_data[index].value != null)
 		{
-			return cast(Reflect.field(_data[index], "value"), Float);
+			return _data[index].value;
 		}
 		return Math.NaN;
 	}
@@ -207,10 +200,10 @@ class PieChart extends Chart
 	/**
 	 * Gets the sum of all the data values.
 	 */
-	function getDataTotal():Float
+	private function getDataTotal():Float
 	{
 		var total:Float = 0;
-		for (i in 0..._data.length)
+		for(i in 0...(_data.length))
 		{
 			total += getValueForData(i);
 		}
@@ -227,14 +220,15 @@ class PieChart extends Chart
 	/**
 	 * Sets/gets the default array of colors to use for each arc.
 	 */
-	public function setColors(value:Array<Int>):Array<Int>
+	public var colors(get, set):Array<Int>;
+	
+	private function set_colors(value:Array<Int>):Array<Int>
 	{
 		_colors = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getColors():Array<Int>
+	private function get_colors():Array<Int>
 	{
 		return _colors;
 	}
@@ -242,17 +236,16 @@ class PieChart extends Chart
 	/**
 	 * Sets/gets the angle at which to start the first slice.
 	 */
-	public function setBeginningAngle(value:Float):Float
+	public var beginningAngle(get, set):Float;
+	
+	private function set_beginningAngle(value:Float):Float
 	{
 		_beginningAngle = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getBeginningAngle():Float
+	private function get_beginningAngle():Float
 	{
 		return _beginningAngle;
 	}
-
-
 }

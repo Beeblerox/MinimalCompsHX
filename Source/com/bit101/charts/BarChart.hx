@@ -28,14 +28,12 @@
 
 package com.bit101.charts;
 
+import flash.display.DisplayObjectContainer;
+
 class BarChart extends Chart
 {
-	
-	public var spacing(getSpacing, setSpacing):Float;
-	public var barColor(getBarColor, setBarColor):Int;
-	
-	var _spacing:Float;
-	var _barColor:Int;
+	private var _spacing:Float = 2;
+	private var _barColor:Int = 0x999999;
 	
 	/**
 	 * Constructor
@@ -44,18 +42,15 @@ class BarChart extends Chart
 	 * @param ypos The y position to place this component.
 	 * @param data The array of numeric values to graph.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?data:Array<Float> = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, data:Array<Dynamic> = null)
 	{
-		_spacing = 2;
-		_barColor = 0x999999;
-		
 		super(parent, xpos, ypos, data);
 	}
 	
 	/**
 	 * Graphs the numeric data in the chart.
 	 */
-	override function drawChart():Void
+	private override function drawChart():Void
 	{
 		var border:Float = 2;
 		var totalSpace:Float = _spacing * _data.length;
@@ -67,9 +62,9 @@ class BarChart extends Chart
 		var max:Float = getMaxValue();
 		var min:Float = getMinValue();
 		var scale:Float = chartHeight / (max - min);
-		for (i in 0..._data.length)
+		for(i in 0...(_data.length))
 		{
-			if(!Math.isNaN(_data[i]))
+			if(_data[i] != null)
 			{
 				_chartHolder.graphics.beginFill(_barColor);
 				_chartHolder.graphics.drawRect(xpos, 0, barWidth, (_data[i] - min) * -scale);
@@ -88,14 +83,15 @@ class BarChart extends Chart
 	/**
 	 * Sets/gets the amount of space shown between each bar. If this is too wide, bars may become invisible.
 	 */
-	public function setSpacing(value:Float):Float
+	public var spacing(get, set):Float;
+	
+	private function set_spacing(value:Float):Float
 	{
 		_spacing = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getSpacing():Float
+	private function get_spacing():Float
 	{
 		return _spacing;
 	}
@@ -103,17 +99,15 @@ class BarChart extends Chart
 	/**
 	 * Sets/gets the color of the bars.
 	 */
-	public function setBarColor(value:Int):Int
+	public var barColor(get, set):Int;
+	
+	private function set_barColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_barColor = value;
-			invalidate();
-		}
+		_barColor = value;
+		invalidate();
 		return value;
 	}
-	
-	public function getBarColor():Int
+	private function get_barColor():Int
 	{
 		return _barColor;
 	}

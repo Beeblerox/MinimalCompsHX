@@ -28,18 +28,13 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
 class TextArea extends Text
 {
-	
-	public var autoHideScrollBar(getAutoHideScrollBar, setAutoHideScrollBar):Bool;
-  public var linesCount (getLinesCount, null) : Int;
-	
-	var _scrollbar:VScrollBar;
-  var _lineAppended : Bool;
-  var _linesCount : Int;
+	private var _scrollbar:VScrollBar;
 	
 	/**
 	 * Constructor
@@ -48,17 +43,15 @@ class TextArea extends Text
 	 * @param ypos The y position to place this component.
 	 * @param text The initial text to display in this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?text:String = "")
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, text:String = "")
 	{
 		super(parent, xpos, ypos, text);
-    _lineAppended = false;
-    _linesCount = 0;
 	}
 	
 	/**
 	 * Initilizes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
@@ -66,7 +59,7 @@ class TextArea extends Text
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		super.addChildren();
 		_scrollbar = new VScrollBar(this, 0, 0, onScrollbarScroll);
@@ -76,17 +69,11 @@ class TextArea extends Text
 	/**
 	 * Changes the thumb percent of the scrollbar based on how much text is shown in the text area.
 	 */
-	function updateScrollbar():Void
+	private function updateScrollbar():Void
 	{
-		#if !js
 		var visibleLines:Int = _tf.numLines - _tf.maxScrollV + 1;
 		var percent:Float = visibleLines / _tf.numLines;
 		_scrollbar.setSliderParams(1, _tf.maxScrollV, _tf.scrollV);
-		#else
-		var visibleLines:Int = 1;
-		var percent:Float = 1;
-		_scrollbar.setSliderParams(1, 0, 0);
-		#end
 		_scrollbar.setThumbPercent(percent);
 		_scrollbar.pageSize = visibleLines;
 	}
@@ -108,11 +95,6 @@ class TextArea extends Text
 		_tf.width = _width - _scrollbar.width - 4;
 		_scrollbar.x = _width - _scrollbar.width;
 		_scrollbar.height = _height;
-    if (_lineAppended)
-    {
-      _scrollbar.goDown ();
-      _lineAppended = false;
-    }
 		_scrollbar.draw();
 		addEventListener(Event.ENTER_FRAME, onTextScrollDelay);
 	}
@@ -127,7 +109,7 @@ class TextArea extends Text
 	 * Waits one more frame before updating scroll bar.
 	 * It seems that numLines and maxScrollV are not valid immediately after changing a TextField's size.
 	 */
-	function onTextScrollDelay(event:Event):Void
+	private function onTextScrollDelay(event:Event):Void
 	{
 		removeEventListener(Event.ENTER_FRAME, onTextScrollDelay);
 		updateScrollbar();
@@ -136,7 +118,7 @@ class TextArea extends Text
 	/**
 	 * Called when the text in the text field is manually changed.
 	 */
-	override function onChange(event:Event):Void
+	override private function onChange(event:Event):Void
 	{
 		super.onChange(event);
 		updateScrollbar();
@@ -145,43 +127,37 @@ class TextArea extends Text
 	/**
 	 * Called when the scroll bar is moved. Scrolls text accordingly.
 	 */
-	function onScrollbarScroll(event:Event):Void
+	private function onScrollbarScroll(event:Event):Void
 	{
-		#if !js
 		_tf.scrollV = Math.round(_scrollbar.value);
-		#end
 	}
 	
 	/**
 	 * Called when the text is scrolled manually. Updates the position of the scroll bar.
 	 */
-	function onTextScroll(event:Event):Void
+	private function onTextScroll(event:Event):Void
 	{
-		#if !js
 		_scrollbar.value = _tf.scrollV;
-		#end
 		updateScrollbar();
 	}
 	
 	/**
 	 * Called when the mouse wheel is scrolled over the component.
 	 */
-	function onMouseWheel(event:MouseEvent):Void
+	private function onMouseWheel(event:MouseEvent):Void
 	{
 		_scrollbar.value -= event.delta;
-		#if !js
 		_tf.scrollV = Math.round(_scrollbar.value);
-		#end
 	}
 
 	/**
 	 * Sets/gets whether this component is enabled or not.
 	 */
-	override public function setEnabled(value:Bool):Bool
+	override private function set_enabled(value:Bool):Bool
 	{
-		super.setEnabled(value);
+		super.enabled = value;
 		#if flash
- 		_tf.tabEnabled = value;
+		_tf.tabEnabled = value;
 		#end
 		return value;
 	}
@@ -189,45 +165,15 @@ class TextArea extends Text
 	/**
 	 * Sets / gets whether the scrollbar will auto hide when there is nothing to scroll.
 	 */
-	public function setAutoHideScrollBar(value:Bool):Bool
+	public var autoHideScrollBar(get_autoHideScrollBar, set_autoHideScrollBar):Bool;
+	
+	private function set_autoHideScrollBar(value:Bool):Bool
 	{
 		_scrollbar.autoHide = value;
 		return value;
 	}
-	
-	public function getAutoHideScrollBar():Bool
+	private function get_autoHideScrollBar():Bool
 	{
 		return _scrollbar.autoHide;
 	}
-
-  override function addLine (l : String) : Void
-  {
-    super.addLine (l);
-    goDown ();
-    _linesCount += 1;
-  }
-
-  public function goDown () : Void
-  {
-	#if !js
-	  _tf.scrollV = _tf.maxScrollV + 1;
-	  #end
-    _lineAppended = true;
-    invalidate ();
-  }
-
-  public function shiftLines (lines : Int) : Void
-  {
-    var l : Array <String> = _text.split ("\n");
-    _text = l.slice (lines).join ("\n");
-    goDown ();
-    _linesCount -= lines;
-  }
-
-  public function getLinesCount () : Int
-  {
-    return _linesCount;
-  }
-
 }
-

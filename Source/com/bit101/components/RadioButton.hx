@@ -29,29 +29,21 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
-import flash.events.Event;
 import flash.events.MouseEvent;
 
 class RadioButton extends Component
 {
+	private var _back:Sprite;
+	private var _button:Sprite;
+	private var _selected:Bool = false;
+	private var _label:Label;
+	private var _labelText:String = "";
+	private var _groupName:String = "defaultRadioGroup";
 	
-	public var selected(getSelected, setSelected):Bool;
-	public var label(getLabel, setLabel):String;
-	public var groupName(getGroupName, setGroupName):String;
+	private static var buttons:Array<RadioButton>;
 	
-	var _back:Sprite;
-	var _button:Sprite;
-	var _selected:Bool;
-	var _label:Label;
-	var _labelText:String;
-	var _groupName:String;
-	
-	static var buttons:Array<RadioButton>;
-	
-	#if !flash
-	var _clickableArea:Sprite;
-	#end
 	
 	/**
 	 * Constructor
@@ -61,20 +53,11 @@ class RadioButton extends Component
 	 * @param label The string to use for the initial label of this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (click in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?checked:Bool = false, ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, label:String = "", checked:Bool = false, defaultHandler:MouseEvent->Void = null)
 	{
-		_selected = false;
-		_labelText = "";
-		_groupName = "defaultRadioGroup";
-		
 		RadioButton.addButton(this);
 		_selected = checked;
 		_labelText = label;
-		
-		#if !flash
-		_clickableArea = new Sprite();
-		#end
-		
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -86,11 +69,11 @@ class RadioButton extends Component
 	 * Static method to add the newly created RadioButton to the list of buttons in the group.
 	 * @param rb The RadioButton to add.
 	 */
-	static function addButton(rb:RadioButton):Void
+	private static function addButton(rb:RadioButton):Void
 	{
 		if(buttons == null)
 		{
-			buttons = new Array();
+			buttons = new Array<RadioButton>();
 		}
 		buttons.push(rb);
 	}
@@ -100,9 +83,9 @@ class RadioButton extends Component
 	 * This could use some rethinking or better naming.
 	 * @param rb The RadioButton to remain selected.
 	 */
-	static function clear(rb:RadioButton):Void
+	private static function clear(rb:RadioButton):Void
 	{
-		for (i in 0...buttons.length)
+		for(i in 0...(buttons.length))
 		{
 			if(buttons[i] != rb && buttons[i].groupName == rb.groupName)
 			{
@@ -114,7 +97,7 @@ class RadioButton extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		
@@ -128,7 +111,7 @@ class RadioButton extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_back = new Sprite();
 		#if flash
@@ -145,11 +128,6 @@ class RadioButton extends Component
 		
 		_label = new Label(this, 0, 0, _labelText);
 		draw();
-		
-		#if !flash
-		addChild(_clickableArea);
-		_clickableArea.alpha = 0.0;
-		#end
 		
 		mouseChildren = false;
 	}
@@ -173,24 +151,15 @@ class RadioButton extends Component
 		_back.graphics.endFill();
 		
 		_button.graphics.clear();
-		_button.graphics.beginFill(Style.LABEL_TEXT);
+		_button.graphics.beginFill(Style.BUTTON_FACE);
 		_button.graphics.drawCircle(5, 5, 3);
 		
 		_label.x = 12;
 		_label.y = (10 - _label.height) / 2;
-		_label.autoSize = true;
-		
 		_label.text = _labelText;
 		_label.draw();
 		_width = _label.width + 12;
 		_height = 10;
-		
-		#if !flash
-		_clickableArea.graphics.clear();
-		_clickableArea.graphics.beginFill(0);
-		_clickableArea.graphics.drawRect(0, 0, _width, height);
-		_clickableArea.graphics.endFill();
-		#end
 	}
 	
 	
@@ -204,7 +173,7 @@ class RadioButton extends Component
 	 * Internal click handler.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onClick(event:MouseEvent):Void
+	private function onClick(event:MouseEvent):Void
 	{
 		selected = true;
 	}
@@ -219,7 +188,9 @@ class RadioButton extends Component
 	/**
 	 * Sets / gets the selected state of this CheckBox.
 	 */
-	public function setSelected(s:Bool):Bool
+	public var selected(get_selected, set_selected):Bool;
+	
+	private function set_selected(s:Bool):Bool
 	{
 		_selected = s;
 		_button.visible = _selected;
@@ -227,11 +198,9 @@ class RadioButton extends Component
 		{
 			RadioButton.clear(this);
 		}
-		dispatchEvent(new Event(Event.CHANGE));
 		return s;
 	}
-	
-	public function getSelected():Bool
+	private function get_selected():Bool
 	{
 		return _selected;
 	}
@@ -239,14 +208,15 @@ class RadioButton extends Component
 	/**
 	 * Sets / gets the label text shown on this CheckBox.
 	 */
-	public function setLabel(str:String):String
+	public var label(get_label, set_label):String;
+	
+	private function set_label(str:String):String
 	{
 		_labelText = str;
 		invalidate();
 		return str;
 	}
-	
-	public function getLabel():String
+	private function get_label():String
 	{
 		return _labelText;
 	}
@@ -254,46 +224,16 @@ class RadioButton extends Component
 	/**
 	 * Sets / gets the group name, which allows groups of RadioButtons to function seperately.
 	 */
-	public function getGroupName():String
+	public var groupName(get_groupName, set_groupName):String;
+	
+	private function get_groupName():String
 	{
 		return _groupName;
 	}
 
-	public function setGroupName(value:String):String
+	private function set_groupName(value:String):String
 	{
 		_groupName = value;
 		return value;
-	}
-
-	/*
-	 * returns the currently selected value for a group of radio buttons
-	 */
-	public static function getGroupValue(groupName:String):String
-	{
-		for (rb in buttons) 
-		{
-			if (rb.groupName == groupName && rb.selected) return rb.label;
-		}
-		return '';
-	}
-	
-	
-	override public function addEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void
-	{
-		#if flash
-		super.addEventListener(type, listener, useCapture, priority, useWeakReference);
-		#else
-		_clickableArea.addEventListener(type, listener, useCapture, priority, useWeakReference);
-		#end
-	}
-	
-	override public function removeEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false):Void
-	{
-		#if flash
-		super.removeEventListener(type, listener, useCapture);
-		#else
-		_clickableArea.removeEventListener(type, listener, useCapture);
-		#end
-	}
-	
+	}	
 }

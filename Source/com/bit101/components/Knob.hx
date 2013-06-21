@@ -28,40 +28,33 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
+enum KnobMode
+{
+	VERTICAL;
+	HORIZONTAL;
+	ROTATE;
+}
+
 class Knob extends Component
 {
-	
-	public var maximum(getMaximum, setMaximum):Float;
-	public var minimum(getMinimum, setMinimum):Float;
-	public var value(getValue, setValue):Float;
-	public var mouseRange(getMouseRange, setMouseRange):Float;
-	public var labelPrecision(getLabelPrecision, setLabelPrecision):Int;
-	public var showValue(getShowValue, setShowValue):Bool;
-	public var label(getLabel, setLabel):String;
-	public var mode(getMode, setMode):String;
-	public var radius(getRadius, setRadius):Float;
-	
-	public static inline var VERTICAL:String = "vertical";
-	public static inline var HORIZONTAL:String = "horizontal";
-	public static inline var ROTATE:String = "rotate";
-	
-	var _knob:Sprite;
-	var _label:Label;
-	var _labelText:String;
-	var _max:Float;
-	var _min:Float;
-	var _mode:String;
-	var _mouseRange:Float;
-	var _precision:Int;
-	var _radius:Float;
-	var _startX:Float;
-	var _startY:Float;
-	var _value:Float;
-	var _valueLabel:Label;
+	private var _knob:Sprite;
+	private var _label:Label;
+	private var _labelText:String = "";
+	private var _max:Float = 100;
+	private var _min:Float = 0;
+	private var _mode:KnobMode;
+	private var _mouseRange:Float = 100;
+	private var _precision:Int = 1;
+	private var _radius:Float = 20;
+	private var _startX:Float;
+	private var _startY:Float;
+	private var _value:Float = 0;
+	private var _valueLabel:Label;
 	
 	
 	/**
@@ -72,18 +65,10 @@ class Knob extends Component
 	 * @param label String containing the label for this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, label:String = "", defaultHandler:Event->Void = null)
 	{
-		_labelText = "";
-		_max = 100;
-		_min = 0;
-		_mode = VERTICAL;
-		_mouseRange = 100;
-		_precision = 1;
-		_radius = 20;
-		_value = 0;
-		
 		_labelText = label;
+		_mode = KnobMode.VERTICAL;
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -94,7 +79,7 @@ class Knob extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 	}
@@ -102,13 +87,11 @@ class Knob extends Component
 	/**
 	 * Creates the children for this component
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_knob = new Sprite();
-		
 		_knob.buttonMode = true;
 		_knob.useHandCursor = true;
-		
 		_knob.addEventListener(MouseEvent.MOUSE_DOWN, onMouseGoDown);
 		addChild(_knob);
 		
@@ -126,7 +109,7 @@ class Knob extends Component
 	/**
 	 * Draw the knob at the specified radius.
 	 */
-	function drawKnob():Void
+	private function drawKnob():Void
 	{
 		_knob.graphics.clear();
 		_knob.graphics.beginFill(Style.BACKGROUND);
@@ -150,7 +133,7 @@ class Knob extends Component
 	/**
 	 * Updates the rotation of the knob based on the value, then formats the value label.
 	 */
-	function updateKnob():Void
+	private function updateKnob():Void
 	{
 		_knob.rotation = -225 + (_value - _min) / (_max - _min) * 270;
 		formatValueLabel();
@@ -159,7 +142,7 @@ class Knob extends Component
 	/**
 	 * Adjusts value to be within minimum and maximum.
 	 */
-	function correctValue():Void
+	private function correctValue():Void
 	{
 		if(_max > _min)
 		{
@@ -176,23 +159,23 @@ class Knob extends Component
 	/**
 	 * Formats the value of the knob to a string based on the current level of precision.
 	 */
-	function formatValueLabel():Void
+	private function formatValueLabel():Void
 	{
 		var mult:Float = Math.pow(10, _precision);
 		var val:String = Std.string(Math.round(_value * mult) / mult);
 		var parts:Array<String> = val.split(".");
-		if(parts[1] == null)
+		if (parts[1] == null)
 		{ 
 			if (_precision > 0)
 			{
 				val += ".";
 			}
-			for (i in 0..._precision)
+			for (i in 0...(_precision))
 			{
 				val += "0";
 			}
 		}
-		else if(parts[1].length < _precision)
+		else if (parts[1].length < _precision)
 		{
 			for (i in 0...(_precision - parts[1].length))
 			{
@@ -237,7 +220,7 @@ class Knob extends Component
 	/**
 	 * Internal handler for when user clicks on the knob. Starts tracking up/down motion of the mouse.
 	 */
-	function onMouseGoDown(event:MouseEvent):Void
+	private function onMouseGoDown(event:MouseEvent):Void
 	{
 		_startX = mouseX;
 		_startY = mouseY;
@@ -248,13 +231,14 @@ class Knob extends Component
 	/**
 	 * Internal handler for mouse move event. Updates value based on how far mouse has moved up or down.
 	 */
-	function onMouseMoved(event:MouseEvent):Void
+	private function onMouseMoved(event:MouseEvent):Void
 	{
 		var oldValue:Float = _value;
 		var diff:Float;
 		var range:Float;
 		var percent:Float;
-		if(_mode == ROTATE)
+		
+		if(_mode == KnobMode.ROTATE)
 		{
 			var angle:Float = Math.atan2(mouseY - _knob.y, mouseX - _knob.x);
 			var rot:Float = angle * 180 / Math.PI - 135;
@@ -270,7 +254,7 @@ class Knob extends Component
 			_knob.rotation = rot + 135;
 			formatValueLabel();
 		}
-		else if(_mode == VERTICAL)
+		else if(_mode == KnobMode.VERTICAL)
 		{
 			diff = _startY - mouseY;
 			range = _max - _min;
@@ -284,7 +268,7 @@ class Knob extends Component
 			}
 			_startY = mouseY;
 		}
-		else if(_mode == HORIZONTAL)
+		else if(_mode == KnobMode.HORIZONTAL)
 		{
 			diff = _startX - mouseX;
 			range = _max - _min;
@@ -303,7 +287,7 @@ class Knob extends Component
 	/**
 	 * Internal handler for mouse up event. Stops mouse tracking.
 	 */
-	function onMouseGoUp(event:MouseEvent):Void
+	private function onMouseGoUp(event:MouseEvent):Void
 	{
 		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMoved);
 		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseGoUp);
@@ -317,15 +301,16 @@ class Knob extends Component
 	/**
 	 * Gets / sets the maximum value of this knob.
 	 */
-	public function setMaximum(m:Float):Float
+	public var maximum(get_maximum, set_maximum):Float;
+	
+	private function set_maximum(m:Float):Float
 	{
 		_max = m;
 		correctValue();
 		updateKnob();
 		return m;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _max;
 	}
@@ -333,15 +318,16 @@ class Knob extends Component
 	/**
 	 * Gets / sets the minimum value of this knob.
 	 */
-	public function setMinimum(m:Float):Float
+	public var minimum(get_minimum, set_minimum):Float;
+	
+	private function set_minimum(m:Float):Float
 	{
 		_min = m;
 		correctValue();
 		updateKnob();
 		return m;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		return _min;
 	}
@@ -349,15 +335,16 @@ class Knob extends Component
 	/**
 	 * Sets / gets the current value of this knob.
 	 */
-	public function setValue(v:Float):Float
+	public var value(get_value, set_value):Float;
+	
+	private function set_value(v:Float):Float
 	{
 		_value = v;
 		correctValue();
 		updateKnob();
 		return v;
 	}
-	
-	public function getValue():Float
+	private function get_value():Float
 	{
 		return _value;
 	}
@@ -365,13 +352,14 @@ class Knob extends Component
 	/**
 	 * Sets / gets the number of pixels the mouse needs to move to make the value of the knob go from min to max.
 	 */
-	public function setMouseRange(value:Float):Float
+	public var mouseRange(get_mouseRange, set_mouseRange):Float;
+	
+	private function set_mouseRange(value:Float):Float
 	{
 		_mouseRange = value;
 		return value;
 	}
-	
-	public function getMouseRange():Float
+	private function get_mouseRange():Float
 	{
 		return _mouseRange;
 	}
@@ -379,13 +367,14 @@ class Knob extends Component
 	/**
 	 * Gets / sets the number of decimals to format the value label.
 	 */
-	public function setLabelPrecision(decimals:Int):Int
+	public var labelPrecision(get_labelPrecision, set_labelPrecision):Int;
+	
+	private function set_labelPrecision(decimals:Int):Int
 	{
 		_precision = decimals;
 		return decimals;
 	}
-	
-	public function getLabelPrecision():Int
+	private function get_labelPrecision():Int
 	{
 		return _precision;
 	}
@@ -393,13 +382,14 @@ class Knob extends Component
 	/**
 	 * Gets / sets whether or not to show the value label.
 	 */
-	public function setShowValue(value:Bool):Bool
+	public var showValue(get_showValue, set_showValue):Bool;
+	
+	private function set_showValue(value:Bool):Bool
 	{
 		_valueLabel.visible = value;
 		return value;
 	}
-	
-	public function getShowValue():Bool
+	private function get_showValue():Bool
 	{
 		return _valueLabel.visible;
 	}
@@ -407,35 +397,39 @@ class Knob extends Component
 	/**
 	 * Gets / sets the text shown in this component's label.
 	 */
-	public function setLabel(str:String):String
+	public var label(get_label, set_label):String;
+	
+	private function set_label(str:String):String
 	{
 		_labelText = str;
 		draw();
 		return str;
 	}
-	
-	public function getLabel():String
+	private function get_label():String
 	{
 		return _labelText;
 	}
-
-	public function setMode(value:String):String
+	
+	public var mode(get_mode, set_mode):KnobMode;
+	
+	private function set_mode(value:KnobMode):KnobMode
 	{
 		_mode = value;
 		return value;
 	}
-	
-	public function getMode():String
+	private function get_mode():KnobMode
 	{
 		return _mode;
 	}
-
-	public function getRadius():Float
+	
+	public var radius(get_radius, set_radius):Float;
+	
+	private function get_radius():Float
 	{
 		return _radius;
 	}
 
-	public function setRadius(value:Float):Float
+	private function set_radius(value:Float):Float
 	{
 		_radius = value;
 		_width = _radius * 2;

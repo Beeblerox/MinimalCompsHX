@@ -30,15 +30,13 @@
 package com.bit101.components;
 
 import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 
 class VBox extends Component
 {
-	public var spacing(getSpacing, setSpacing):Float;
-	public var alignment(getAlignment, setAlignment):String;
-	
-	var _spacing:Float;
-	private var _alignment:String;
+	private var _spacing:Float = 5;
+	private var _alignment:String = VBox.NONE;
 	
 	public static inline var LEFT:String = "left";
 	public static inline var RIGHT:String = "right";
@@ -51,20 +49,17 @@ class VBox extends Component
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0)
 	{
-		_alignment = NONE;
-		_spacing = 5;
-		
 		super(parent, xpos, ypos);
 	}
 	
 	/**
 	 * Override of addChild to force layout;
 	 */
-	override public function addChild(child:Dynamic)
+	override public function addChild(child:DisplayObject):DisplayObject
 	{
-		child = super.addChild(child);
+		super.addChild(child);
 		child.addEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -73,9 +68,9 @@ class VBox extends Component
 	/**
 	 * Override of addChildAt to force layout;
 	 */
-	override public function addChildAt(child:Dynamic, index:Int)
+	override public function addChildAt(child:DisplayObject, index:Int):DisplayObject
 	{
-		child = super.addChildAt(child, index);
+		super.addChildAt(child, index);
 		child.addEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -84,9 +79,9 @@ class VBox extends Component
 	/**
 	 * Override of removeChild to force layout;
 	 */
-	override public function removeChild(child:Dynamic)
+	override public function removeChild(child:DisplayObject):DisplayObject
 	{
-		child = super.removeChild(child);            
+		super.removeChild(child);            
 		child.removeEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -95,9 +90,9 @@ class VBox extends Component
 	/**
 	 * Override of removeChild to force layout;
 	 */
-	override public function removeChildAt(index:Int)
+	override public function removeChildAt(index:Int):DisplayObject
 	{
-		var child = super.removeChildAt(index);
+		var child:DisplayObject = super.removeChildAt(index);
 		child.removeEventListener(Event.RESIZE, onResize);
 		draw();
 		return child;
@@ -106,7 +101,7 @@ class VBox extends Component
 	/**
 	 * Internal handler for resize event of any attached component. Will redo the layout based on new size.
 	 */
-	function onResize(event:Event):Void
+	private function onResize(event:Event):Void
 	{
 		invalidate();
 	}
@@ -114,22 +109,22 @@ class VBox extends Component
 	/**
 	 * Sets element's x positions based on alignment value.
 	 */
-	function doAlignment():Void
+	private function doAlignment():Void
 	{
-		if(_alignment != NONE)
+		if(_alignment != VBox.NONE)
 		{
-			for(i in 0...numChildren)
+			for (i in 0...numChildren)
 			{
 				var child:DisplayObject = getChildAt(i);
-				if(_alignment == LEFT)
+				if(_alignment == VBox.LEFT)
 				{
 					child.x = 0;
 				}
-				else if(_alignment == RIGHT)
+				else if(_alignment == VBox.RIGHT)
 				{
 					child.x = _width - child.width;
 				}
-				else if(_alignment == CENTER)
+				else if(_alignment == VBox.CENTER)
 				{
 					child.x = (_width - child.width) / 2;
 				}
@@ -148,7 +143,6 @@ class VBox extends Component
 		for (i in 0...numChildren)
 		{
 			var child:DisplayObject = getChildAt(i);
-			if (!child.visible) continue;
 			child.y = ypos;
 			ypos += child.height;
 			ypos += _spacing;
@@ -158,20 +152,20 @@ class VBox extends Component
 		
 		doAlignment();
 		_height += _spacing * (numChildren - 1);
-		dispatchEvent(new Event(Event.RESIZE));
 	}
 	
 	/**
 	 * Gets / sets the spacing between each sub component.
 	 */
-	public function setSpacing(s:Float):Float
+	public var spacing(get_spacing, set_spacing):Float;
+	
+	private function set_spacing(s:Float):Float
 	{
 		_spacing = s;
 		invalidate();
 		return s;
 	}
-	
-	public function getSpacing():Float
+	private function get_spacing():Float
 	{
 		return _spacing;
 	}
@@ -179,23 +173,16 @@ class VBox extends Component
 	/**
 	 * Gets / sets the horizontal alignment of components in the box.
 	 */
-	public function setAlignment(value:String):String
+	public var alignment(get_alignment, set_alignment):String;
+	
+	private function set_alignment(value:String):String
 	{
 		_alignment = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getAlignment():String
+	private function get_alignment():String
 	{
 		return _alignment;
 	}
-	
-	override public function setVisible(value:Bool):Bool 
-	{
-		super.setVisible(value);
-		dispatchEvent(new Event(Event.RESIZE, true));
-		return value;
-	}
-	
 }

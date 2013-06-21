@@ -29,25 +29,18 @@
 package com.bit101.components;
 
 import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
-import flash.events.Event;
 
 class Panel extends Component
 {
-	
-	public var color(getColor, setColor):Int;
-	public var shadow(getShadowBool, setShadowBool):Bool;
-	public var gridSize(getGridSize, setGridSize):Int;
-	public var showGrid(getShowGrid, setShowGrid):Bool;
-	public var gridColor(getGridColor, setGridColor):Int;
-	
-	var _mask:Sprite;
-	var _background:Sprite;
-	var _color:Int;
-	var _shadow:Bool;
-	var _gridSize:Int;
-	var _showGrid:Bool;
-	var _gridColor:Int;
+	private var _mask:Sprite;
+	private var _background:Sprite;
+	private var _color:Int = -1;
+	private var _shadow:Bool = true;
+	private var _gridSize:Int = 10;
+	private var _showGrid:Bool = false;
+	private var _gridColor:Int = 0xd0d0d0;
 	
 	
 	/**
@@ -62,14 +55,8 @@ class Panel extends Component
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0)
 	{
-		_color = -1;
-		_shadow = true;
-		_gridSize = 10;
-		_showGrid = false;
-		_gridColor = 0xd0d0d0;
-		
 		super(parent, xpos, ypos);
 	}
 	
@@ -77,7 +64,7 @@ class Panel extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		setSize(100, 100);
@@ -86,7 +73,7 @@ class Panel extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_background = new Sprite();
 		super.addChild(_background);
@@ -99,8 +86,7 @@ class Panel extends Component
 		super.addChild(content);
 		content.mask = _mask;
 		#if flash
-		filters = [];
-		filters.push(getShadow(2, true));
+		filters = [getShadow(2, true)];
 		#end
 	}
 	
@@ -114,57 +100,19 @@ class Panel extends Component
 	/**
 	 * Overridden to add new child to content.
 	 */
-	override public function addChild(child:Dynamic)
+	public override function addChild(child:DisplayObject):DisplayObject
 	{
-		if (Std.is(child, Component)) 
-		{
-			child.parent = this;
-			child = untyped child._comp;			
-		}
-		return content.addChild(child);
+		content.addChild(child);
+		return child;
 	}
-	
-	override public function addChildAt(child:Dynamic, index:Int)
-	{
-		if (Std.is(child, Component)) 
-		{
-			child.parent = this;
-			child = untyped child._comp;			
-		}
-		return content.addChildAt(child, index);
-	}
-	
-	override public function removeChild(child:Dynamic) 
-	{
-		if (Std.is(child, Component)) 
-		{
-			child.parent = null;
-			child = untyped child._comp;			
-		}
-		return content.removeChild(child);
-	}
-	
-	override public function removeChildAt(index:Int):DisplayObject
-	{
-		return content.removeChildAt(index);
-	}
-	
-	override public function contains(child:Dynamic):Bool 
-	{
-		if (Std.is(child, Component)) 
-		{
-			child = untyped child._comp;			
-		}
-		return content.contains(child);
-	}
-	
 	
 	/**
 	 * Access to super.addChild
 	 */
-	public function addRawChild(child:Dynamic):DisplayObject
+	public function addRawChild(child:DisplayObject):DisplayObject
 	{
-		return super.addChild(child);
+		super.addChild(child);
+		return child;
 	}
 	
 	/**
@@ -189,16 +137,17 @@ class Panel extends Component
 		drawGrid();
 		
 		_mask.graphics.clear();
-		_mask.graphics.beginFill(0xffffff);
+		_mask.graphics.beginFill(0xff0000);
 		_mask.graphics.drawRect(0, 0, _width, _height);
 		_mask.graphics.endFill();
 	}
 	
-	function drawGrid():Void
+	private function drawGrid():Void
 	{
 		if(!_showGrid) return;
 		
 		_background.graphics.lineStyle(0, _gridColor);
+		
 		var i:Int = 0;
 		while (i < _width)
 		{
@@ -206,6 +155,7 @@ class Panel extends Component
 			_background.graphics.lineTo(i, _height);
 			i += _gridSize;
 		}
+		
 		i = 0;
 		while (i < _height)
 		{
@@ -228,14 +178,15 @@ class Panel extends Component
 	/**
 	 * Gets / sets whether or not this Panel will have an inner shadow.
 	 */
-	public function setShadowBool(b:Bool):Bool
+	public var shadow(get_shadow, set_shadow):Bool;
+	
+	private function set_shadow(b:Bool):Bool
 	{
 		_shadow = b;
 		#if flash
 		if(_shadow)
 		{
-			filters = [];
-			filters.push(getShadow(2, true));
+			filters = [getShadow(2, true)];
 		}
 		else
 		{
@@ -244,8 +195,7 @@ class Panel extends Component
 		#end
 		return b;
 	}
-	
-	public function getShadowBool():Bool
+	private function get_shadow():Bool
 	{
 		return _shadow;
 	}
@@ -253,14 +203,15 @@ class Panel extends Component
 	/**
 	 * Gets / sets the backgrond color of this panel.
 	 */
-	public function setColor(c:Int):Int
+	public var color(get_color, set_color):Int;
+	
+	private function set_color(c:Int):Int
 	{
 		_color = c;
 		invalidate();
 		return c;
 	}
-	
-	public function getColor():Int
+	private function get_color():Int
 	{
 		return _color;
 	}
@@ -268,14 +219,15 @@ class Panel extends Component
 	/**
 	 * Sets / gets the size of the grid.
 	 */
-	public function setGridSize(value:Int):Int
+	public var gridSize(get_gridSize, set_gridSize):Int;
+	
+	private function set_gridSize(value:Int):Int
 	{
 		_gridSize = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getGridSize():Int
+	private function get_gridSize():Int
 	{
 		return _gridSize;
 	}
@@ -283,14 +235,15 @@ class Panel extends Component
 	/**
 	 * Sets / gets whether or not the grid will be shown.
 	 */
-	public function setShowGrid(value:Bool):Bool
+	public var showGrid(get_showGrid, set_showGrid):Bool;
+	
+	private function set_showGrid(value:Bool):Bool
 	{
 		_showGrid = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getShowGrid():Bool
+	private function get_showGrid():Bool
 	{
 		return _showGrid;
 	}
@@ -298,37 +251,16 @@ class Panel extends Component
 	/**
 	 * Sets / gets the color of the grid lines.
 	 */
-	public function setGridColor(value:Int):Int
+	public var gridColor(get_gridColor, set_gridColor):Int;
+	
+	private function set_gridColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_gridColor = value;
-			invalidate();
-		}
+		_gridColor = value;
+		invalidate();
 		return value;
 	}
-	
-	public function getGridColor():Int
+	private function get_gridColor():Int
 	{
 		return _gridColor;
 	}
-	
-	override public function addEventListener(type:String, listener:Dynamic->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void
-	{
-		#if !flash
-		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
-		#else
-		content.addEventListener(type, listener, useCapture, priority, useWeakReference);
-		#end
-	}
-	
-	override public function dispatchEvent(event:Event):Bool 
-	{
-		#if !flash
-		return _comp.dispatchEvent(event);
-		#else
-		return content.dispatchEvent(event);
-		#end
-	}
-	
 }

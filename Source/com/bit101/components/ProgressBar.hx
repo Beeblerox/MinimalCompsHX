@@ -28,18 +28,15 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 
 class ProgressBar extends Component
 {
-	
-	public var maximum(getMaximum, setMaximum):Float;
-	public var value(getValue, setValue):Float;
-	
-	var _back:Sprite;
-	var _bar:Sprite;
-	var _value:Float;
-	var _max:Float;
+	private var _back:Sprite;
+	private var _bar:Sprite;
+	private var _value:Float = 0;
+	private var _max:Float = 1;
 
 	/**
 	 * Constructor
@@ -47,11 +44,8 @@ class ProgressBar extends Component
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0)
 	{
-		_value = 0;
-		_max = 1;
-		
 		super(parent, xpos, ypos);
 	}
 	
@@ -59,7 +53,7 @@ class ProgressBar extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		setSize(100, 10);
@@ -68,7 +62,7 @@ class ProgressBar extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_back = new Sprite();
 		#if flash
@@ -88,7 +82,7 @@ class ProgressBar extends Component
 	/**
 	 * Updates the size of the progress bar based on the current value.
 	 */
-	function update():Void
+	private function update():Void
 	{
 		_bar.scaleX = _value / _max;
 	}
@@ -132,15 +126,16 @@ class ProgressBar extends Component
 	/**
 	 * Gets / sets the maximum value of the ProgressBar.
 	 */
-	public function setMaximum(m:Float):Float
+	public var maximum(get_maximum, set_maximum):Float;
+	
+	private function set_maximum(m:Float):Float
 	{
 		_max = m;
 		_value = Math.min(_value, _max);
 		update();
 		return m;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		return _max;
 	}
@@ -148,14 +143,15 @@ class ProgressBar extends Component
 	/**
 	 * Gets / sets the current value of the ProgressBar.
 	 */
-	public function setValue(v:Float):Float
+	public var value(get_value, set_value):Float;
+	
+	private function set_value(v:Float):Float
 	{
 		_value = Math.min(v, _max);
 		update();
 		return v;
 	}
-	
-	public function getValue():Float
+	private function get_value():Float
 	{
 		return _value;
 	}

@@ -32,31 +32,21 @@ import com.bit101.components.Component;
 import com.bit101.components.Label;
 import com.bit101.components.Panel;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Shape;
 
 class Chart extends Component
 {
-	
-	public var data(getData, setData):Array<Dynamic>;
-	public var maximum(getMaximum, setMaximum):Float;
-	public var minimum(getMinimum, setMinimum):Float;
-	public var autoScale(getAutoScale, setAutoScale):Bool;
-	public var showScaleLabels(getShowScaleLabels, setShowScaleLabels):Bool;
-	public var labelPrecision(getLabelPrecision, setLabelPrecision):Int;
-	public var gridSize(getGridSize, setGridSize):Int;
-	public var showGrid(getShowGrid, setShowGrid):Bool;
-	public var gridColor(getGridColor, setGridColor):Int;
-	
-	var _data:Array<Dynamic>;
-	var _chartHolder:Shape;
-	var _maximum:Float;
-	var _minimum:Float;
-	var _autoScale:Bool;
-	var _maxLabel:Label;
-	var _minLabel:Label;
-	var _showScaleLabels:Bool;
-	var _labelPrecision:Int;
-	var _panel:Panel;
+	private var _data:Array<Dynamic>;
+	private var _chartHolder:Shape;
+	private var _maximum:Float = 100;
+	private var _minimum:Float = 0;
+	private var _autoScale:Bool = true;
+	private var _maxLabel:Label;
+	private var _minLabel:Label;
+	private var _showScaleLabels:Bool = false;
+	private var _labelPrecision:Int = 0;
+	private var _panel:Panel;
 	
 	/**
 	 * Constructor
@@ -65,14 +55,8 @@ class Chart extends Component
 	 * @param ypos The y position to place this component.
 	 * @param data The array of numeric values to graph.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?data:Array<Dynamic> = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, data:Array<Dynamic> = null)
 	{
-		_maximum = 100;
-		_minimum = 0;
-		_autoScale = true;
-		_showScaleLabels = false;
-		_labelPrecision = 0;
-		
 		_data = data;
 		super(parent, xpos, ypos);
 	}
@@ -80,7 +64,7 @@ class Chart extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	private override function init():Void
 	{
 		super.init();
 		setSize(200, 100);
@@ -89,7 +73,7 @@ class Chart extends Component
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		super.addChildren();
 		_panel = new Panel(this);
@@ -104,20 +88,20 @@ class Chart extends Component
 	/**
 	 * Graphs the numeric data in the chart. Override in subclasses.
 	 */
-	function drawChart():Void
+	private function drawChart():Void
 	{
 	}
 	
 	/**
 	 * Gets the highest value of the numbers in the data array.
 	 */
-	function getMaxValue():Float
+	private function getMaxValue():Float
 	{
-		if (!_autoScale) return _maximum;
+		if(!_autoScale) return _maximum;
 		var maxValue:Float = Math.NEGATIVE_INFINITY;
-		for (i in 0..._data.length)
+		for(i in 0...(_data.length))
 		{
-			if(!Math.isNaN(_data[i]))
+			if(_data[i] != null)
 			{
 				maxValue = Math.max(_data[i], maxValue);
 			}
@@ -128,13 +112,13 @@ class Chart extends Component
 	/**
 	 * Gets the lowest value of the numbers in the data array.
 	 */
-	function getMinValue():Float
+	private function getMinValue():Float
 	{
-		if (!_autoScale) return _minimum;
+		if(!_autoScale) return _minimum;
 		var minValue:Float = Math.POSITIVE_INFINITY;
-		for (i in 0..._data.length)
+		for(i in 0...(_data.length))
 		{
-			if(!Math.isNaN(_data[i]))
+			if(_data[i] != null)
 			{
 				minValue = Math.min(_data[i], minValue);
 			}
@@ -181,14 +165,15 @@ class Chart extends Component
 	/**
 	 * Sets/gets the data array.
 	 */
-	public function setData(value:Array<Dynamic>):Array<Dynamic>
+	public var data(get, set):Array<Dynamic>;
+	
+	private function set_data(value:Array<Dynamic>):Array<Dynamic>
 	{
 		_data = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getData():Array<Dynamic>
+	private function get_data():Array<Dynamic>
 	{
 		return _data;
 	}
@@ -196,14 +181,15 @@ class Chart extends Component
 	/**
 	 * Sets/gets the maximum value of the graph. Only used if autoScale is false.
 	 */
-	public function setMaximum(value:Float):Float
+	public var maximum(get, set):Float;
+	
+	private function set_maximum(value:Float):Float
 	{
 		_maximum = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getMaximum():Float
+	private function get_maximum():Float
 	{
 		if(_autoScale) return getMaxValue();
 		return _maximum;
@@ -212,14 +198,15 @@ class Chart extends Component
 	/**
 	 * Sets/gets the minimum value of the graph. Only used if autoScale is false.
 	 */
-	public function setMinimum(value:Float):Float
+	public var minimum(get, set):Float;
+	
+	private function set_minimum(value:Float):Float
 	{
 		_minimum = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getMinimum():Float
+	private function get_minimum():Float
 	{
 		if(_autoScale) return getMinValue();
 		return _minimum;
@@ -228,14 +215,15 @@ class Chart extends Component
 	/**
 	 * Sets/gets whether the graph will automatically set its own max and min values based on the data values.
 	 */
-	public function setAutoScale(value:Bool):Bool
+	public var autoScale(get, set):Bool;
+	
+	private function set_autoScale(value:Bool):Bool
 	{
 		_autoScale = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getAutoScale():Bool
+	private function get_autoScale():Bool
 	{
 		return _autoScale;
 	}
@@ -244,7 +232,9 @@ class Chart extends Component
 	 * Sets/gets whether or not labels for max and min graph values will be shown.
 	 * Note: these labels will be to the left of the x position of the chart. Chart position may need adjusting.
 	 */
-	public function setShowScaleLabels(value:Bool):Bool
+	public var showScaleLabels(get, set):Bool;
+	
+	private function set_showScaleLabels(value:Bool):Bool
 	{
 		_showScaleLabels = value;
 		if(_showScaleLabels )
@@ -259,8 +249,7 @@ class Chart extends Component
 		}
 		return value;
 	}
-	
-	public function getShowScaleLabels():Bool
+	private function get_showScaleLabels():Bool
 	{
 		return _showScaleLabels;
 	}
@@ -268,14 +257,15 @@ class Chart extends Component
 	/**
 	 * Sets/gets the amount of decimal places shown in the scale labels.
 	 */
-	public function setLabelPrecision(value:Int):Int
+	public var labelPrecision(get, set):Int;
+	
+	private function set_labelPrecision(value:Int):Int
 	{
 		_labelPrecision = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getLabelPrecision():Int
+	private function get_labelPrecision():Int
 	{
 		return _labelPrecision;
 	}
@@ -283,14 +273,15 @@ class Chart extends Component
 	/**
 	 * Sets / gets the size of the grid.
 	 */
-	public function setGridSize(value:Int):Int
+	public var gridSize(get, set):Int;
+	
+	private function set_gridSize(value:Int):Int
 	{
 		_panel.gridSize = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getGridSize():Int
+	private function get_gridSize():Int
 	{
 		return _panel.gridSize;
 	}
@@ -298,14 +289,15 @@ class Chart extends Component
 	/**
 	 * Sets / gets whether or not the grid will be shown.
 	 */
-	public function setShowGrid(value:Bool):Bool
+	public var showGrid(get, set):Bool;
+	
+	private function set_showGrid(value:Bool):Bool
 	{
 		_panel.showGrid = value;
 		invalidate();
 		return value;
 	}
-	
-	public function getShowGrid():Bool
+	private function get_showGrid():Bool
 	{
 		return _panel.showGrid;
 	}
@@ -313,19 +305,16 @@ class Chart extends Component
 	/**
 	 * Sets / gets the color of the grid lines.
 	 */
-	public function setGridColor(value:Int):Int
+	public var gridColor(get, set):Int;
+	
+	private function set_gridColor(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_panel.gridColor = value;
-			invalidate();
-		}
+		_panel.gridColor = value;
+		invalidate();
 		return value;
 	}
-	
-	public function getGridColor():Int
+	private function get_gridColor():Int
 	{
 		return _panel.gridColor;
 	}
-
 }

@@ -33,25 +33,20 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Shape;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
 class Calendar extends Panel
 {
-	
-	public var selectedDate(getSelectedDate, null):Date;
-	public var month(getMonth, null):Int;
-	public var year(getYear, null):Int;
-	public var day(getDay, null):Int;
-	
-	var _dateLabel:Label;
-	var _day:Int;
-	var _dayButtons:Array<PushButton>;
-	var _month:Int;
-	var _monthNames:Array<String>;
-	var _selection:Shape;
-	var _year:Int;
+	private var _dateLabel:Label;
+	private var _day:Int;
+	private var _dayButtons:Array<PushButton>;
+	private var _month:Int;
+	private var _monthNames:Array<String>;
+	private var _selection:Shape;
+	private var _year:Int;
 	
 	/**
 	 * Constructor
@@ -59,18 +54,17 @@ class Calendar extends Panel
 	 * @param xpos The x position to place this component.
 	 * @param ypos The y position to place this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0)
 	{
-		_dayButtons = new Array();
 		_monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-		
+		_dayButtons = new Array<PushButton>();
 		super(parent, xpos, ypos);
 	}
 	
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	private override function init():Void
 	{
 		super.init();
 		setSize(140, 140);
@@ -81,12 +75,12 @@ class Calendar extends Panel
 	/**
 	 * Creates and adds the child display objects of this component.
 	 */
-	override function addChildren():Void
+	private override function addChildren():Void
 	{
 		super.addChildren();
-		for (i in 0...6)
+		for(i in 0...6)
 		{
-			for (j in 0...7)
+			for(j in 0...7)
 			{
 				var btn:PushButton = new PushButton(this.content, j * 20, 20 + i * 20);
 				btn.setSize(19, 19);
@@ -122,7 +116,7 @@ class Calendar extends Panel
 	 * @param year The year in which the month is in (needed for leap years).
 	 * @return The last day of the month.
 	 */
-	function getEndDay(month:Int, year:Int):Int
+	private function getEndDay(month:Int, year:Int):Int
 	{
 		switch(month)
 		{
@@ -133,8 +127,7 @@ class Calendar extends Panel
 			case 7:		// aug
 			case 9:		// oct
 			case 11:	// dec
-				return 31;
-			
+				return 31;			
 			case 1:		// feb
 				if((year % 400 == 0) ||  ((year % 100 != 0) && (year % 4 == 0))) return 29;
 				return 28;
@@ -158,11 +151,11 @@ class Calendar extends Panel
 		_day = date.getDate();
 		var startDay:Int = new Date(_year, _month, 1, 0, 0, 0).getDay();
 		var endDay:Int = getEndDay(_month, _year);
-		for (i in 0...42)
+		for(i in 0...42)
 		{
 			_dayButtons[i].visible = false;
 		}
-		for (i in 0...endDay)
+		for(i in 0...endDay)
 		{
 			var btn:PushButton = _dayButtons[i + startDay];
 			btn.visible = true;
@@ -198,7 +191,7 @@ class Calendar extends Panel
 	/**
 	 * Advances the month forward by one.
 	 */
-	function onNextMonth(event:MouseEvent):Void
+	private function onNextMonth(event:MouseEvent):Void
 	{
 		_month++;
 		if(_month > 11)
@@ -206,14 +199,14 @@ class Calendar extends Panel
 			_month = 0;
 			_year++;
 		}
-		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
+		_day = Std.int(Math.min(_day, getEndDay(_month, _year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
 	/**
 	 * Moves the month back by one.
 	 */
-	function onPrevMonth(event:MouseEvent):Void
+	private function onPrevMonth(event:MouseEvent):Void
 	{
 		_month--;
 		if(_month < 0)
@@ -221,49 +214,41 @@ class Calendar extends Panel
 			_month = 11;
 			_year--;
 		}
-		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
+		_day = Std.int(Math.min(_day,getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
 	/**
 	 * Advances the year forward by one.
 	 */
-	function onNextYear(event:MouseEvent):Void
+	private function onNextYear(event:MouseEvent):Void
 	{
 		_year++;
-		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
+		_day = Std.int(Math.min(_day,getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
 	/**
 	 * Moves the year back by one.
 	 */
-	function onPrevYear(event:MouseEvent):Void
+	private function onPrevYear(event:MouseEvent):Void
 	{
 		_year--;
-		_day = Std.int(Math.min(_day, getEndDay(_month,_year)));
+		_day = Std.int(Math.min(_day,getEndDay(_month,_year)));
 		setYearMonthDay(_year, _month, _day);
 	}
 	
 	/**
 	 * Called when a date button is clicked. Selects that date.
 	 */
-	function onDayClick(event:MouseEvent):Void
+	private function onDayClick(event:MouseEvent):Void
 	{
-		var dayBtn:PushButton = null;
-		for (pb in _dayButtons)
+		if (Std.is(event.target, PushButton))
 		{
-			if (pb.contains(event.target))
-			{
-				_day = pb.tag;
-				setYearMonthDay(_year, _month, _day);
-				dispatchEvent(new Event(Event.SELECT));
-				break;
-			}
+			_day = cast (event.target, PushButton).tag;
+			setYearMonthDay(_year, _month, _day);
+			dispatchEvent(new Event(Event.SELECT));
 		}
-/*		_day = event.target.tag;
-		setYearMonthDay(_year, _month, _day);
-		dispatchEvent(new Event(Event.SELECT));*/
 	}
 	
 	///////////////////////////////////
@@ -273,7 +258,9 @@ class Calendar extends Panel
 	/**
 	 * Gets the currently selected Date.
 	 */
-	public function getSelectedDate():Date
+	public var selectedDate(get, null):Date;
+	
+	private function get_selectedDate():Date
 	{
 		return new Date(_year, _month, _day, 0, 0, 0);
 	}
@@ -281,7 +268,9 @@ class Calendar extends Panel
 	/**
 	 * Gets the current month.
 	 */
-	public function getMonth():Int
+	public var month(get, null):Int;
+	
+	private function get_month():Int
 	{
 		return _month;
 	}
@@ -289,7 +278,9 @@ class Calendar extends Panel
 	/**
 	 * Gets the current year.
 	 */
-	public function getYear():Int
+	public var year(get, null):Int;
+	
+	private function get_year():Int
 	{
 		return _year;
 	}
@@ -297,7 +288,9 @@ class Calendar extends Panel
 	/**
 	 * Gets the current day.
 	 */
-	public function getDay():Int
+	public var day(get, null):Int;
+	
+	private function get_day():Int
 	{
 		return _day;
 	}

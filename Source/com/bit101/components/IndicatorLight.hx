@@ -28,28 +28,21 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.GradientType;
 import flash.display.Shape;
-//import flash.events.TimerEvent;
+import flash.events.TimerEvent;
 import flash.geom.Matrix;
-import haxe.Timer;
+import flash.utils.Timer;
 
 class IndicatorLight extends Component
 {
-	
-	public var isLit(getIsLit, setIsLit):Bool;
-	public var color(getColor, setColor):Int;
-	public var isFlashing(getIsFlashing, null):Bool;
-	public var label(getLabel, setLabel):String;
-	
-	var _color:Int;
-	var _lit:Bool;
-	var _label:Label;
-	var _labelText:String;
-	var _lite:Shape;
-	var _timer:Timer;
-	var _timerRunning:Bool;
-	
+	private var _color:Int;
+	private var _lit:Bool = false;
+	private var _label:Label;
+	private var _labelText:String = "";
+	private var _lite:Shape;
+	private var _timer:Timer;
 	
 	/**
 	 * Constructor
@@ -59,39 +52,27 @@ class IndicatorLight extends Component
 	 * @param color The color of this light.
 	 * @param label String containing the label for this component.
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?color:Int = 0xff0000, ?label:String = "")
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, color:Int = 0xff0000, label:String = "")
 	{
-		_lit = false;
-		_labelText = "";
-		if (color >= 0)
-		{
-			_color = color;
-		}
-		else
-		{
-			_color = 0xff0000;
-		}
+		_color = color;
 		_labelText = label;
-		
-		_timerRunning = false;
-		
 		super(parent, xpos, ypos);
 	}
 
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		_timer = new Timer(500);
-		//_timer.addEventListener(TimerEvent.TIMER, onTimer);
+		_timer.addEventListener(TimerEvent.TIMER, onTimer);
 	}
 	
 	/**
 	 * Creates the children for this component
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_lite = new Shape();
 		addChild(_lite);
@@ -103,10 +84,9 @@ class IndicatorLight extends Component
 	/**
 	 * Draw the light.
 	 */
-	function drawLite():Void
+	private function drawLite():Void
 	{
 		var colors:Array<Int>;
-		#if flash
 		if(_lit)
 		{
 			colors = [0xffffff, _color];
@@ -115,24 +95,11 @@ class IndicatorLight extends Component
 		{
 			colors = [0xffffff, 0];
 		}
-		#else
-		if(_lit)
-		{
-			colors = [0xffffff, _color];
-		}
-		else
-		{
-			colors = [0xffffff, Style.BACKGROUND];
-		}
-		#end
+		
 		_lite.graphics.clear();
-		#if flash
 		var matrix:Matrix = new Matrix();
 		matrix.createGradientBox(10, 10, 0, -2.5, -2.5);
 		_lite.graphics.beginGradientFill(GradientType.RADIAL, colors, [1, 1], [0, 255], matrix);
-		#else
-		_lite.graphics.beginFill(colors[1]);
-		#end
 		_lite.graphics.drawCircle(5, 5, 5);
 		_lite.graphics.endFill();
 	}
@@ -147,7 +114,7 @@ class IndicatorLight extends Component
 	 * Internal timer handler.
 	 * @param event The TimerEvent passed by the system.
 	 */
-	function onTimer(/*event:TimerEvent*/):Void
+	private function onTimer(event:TimerEvent):Void
 	{
 		_lit = !_lit;
 		draw();
@@ -178,19 +145,16 @@ class IndicatorLight extends Component
 	/**
 	 * Causes the light to flash on and off at the specified interval (milliseconds). A value less than 1 stops the flashing.
 	 */
-	public function flash(?interval:Int = 500):Void
+	public function flash(interval:Int = 500):Void
 	{
 		if(interval < 1)
 		{
 			_timer.stop();
-			_timerRunning = false;
 			isLit = false;
 			return;
 		}
-		
-		_timer = new Timer(interval);
-		_timer.run = onTimer;
-		_timerRunning = true;
+		_timer.delay = interval;
+		_timer.start();
 	}
 	
 	
@@ -203,16 +167,15 @@ class IndicatorLight extends Component
 	/**
 	 * Sets or gets whether or not the light is lit.
 	 */
-	public function setIsLit(value:Bool):Bool
+	public var isLit(get, set):Bool;
+	private function set_isLit(value:Bool):Bool
 	{
 		_timer.stop();
-		_timerRunning = false;
 		_lit = value;
 		drawLite();
 		return value;
 	}
-	
-	public function getIsLit():Bool
+	private function get_isLit():Bool
 	{
 		return _lit;
 	}
@@ -220,17 +183,15 @@ class IndicatorLight extends Component
 	/**
 	 * Sets / gets the color of this light (when lit).
 	 */
-	public function setColor(value:Int):Int
+	public var color(get, set):Int;
+	
+	private function set_color(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_color = value;
-			draw();
-		}
+		_color = value;
+		draw();
 		return value;
 	}
-	
-	public function getColor():Int
+	private function get_color():Int
 	{
 		return _color;
 	}
@@ -238,26 +199,25 @@ class IndicatorLight extends Component
 	/**
 	 * Returns whether or not the light is currently flashing.
 	 */
-	public function getIsFlashing():Bool
+	public var isFlashing(get, null):Bool;
+	private function get_isFlashing():Bool
 	{
-		//return _timer.running;
-		return _timerRunning;
+		return _timer.running;
 	}
 	
 	/**
 	 * Sets / gets the label text shown on this component.
 	 */
-	public function setLabel(str:String):String
+	public var label(get, set):String;
+	
+	private function set_label(str:String):String
 	{
 		_labelText = str;
 		draw();
 		return str;
 	}
-	
-	public function getLabel():String
+	private function get_label():String
 	{
 		return _labelText;
 	}
-	
-
 }

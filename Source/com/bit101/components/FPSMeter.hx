@@ -28,21 +28,17 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.events.Event;
 import flash.Lib;
 
-
 class FPSMeter extends Component
 {
-	
-	public var prefix(getPrefix, setPrefix):String;
-	public var fps(getFps, null):Int;
-	
-	var _label:Label;
-	var _startTime:Int;
-	var _frames:Int;
-	var _prefix:String;
-	var _fps:Int;
+	private var _label:Label;
+	private var _startTime:Int;
+	private var _frames:Int;
+	private var _prefix:String = "";
+	private var _fps:Int = 0;
 	
 	/**
 	 * Constructor
@@ -52,11 +48,8 @@ class FPSMeter extends Component
 	 * @param prefix A string to put in front of the number value shown. Default is "FPS:".
 	 */
 	
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?prefix:String = "FPS:")
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float = 0, prefix:String = "FPS:")
 	{
-		_prefix = "";
-		_fps = 0;
-		
 		super(parent, xpos, ypos);
 		_prefix = prefix;
 		_frames = 0;
@@ -69,7 +62,7 @@ class FPSMeter extends Component
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 	}
 	
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		super.addChildren();
 		_label = new Label(this, 0, 0);
@@ -78,13 +71,13 @@ class FPSMeter extends Component
 	
 	public override function draw():Void
 	{
-		_label.text = _prefix + Std.string(_fps);
+		_label.text = _prefix + _fps;
 	}
 	
 	/**
 	 * Internal enterFrame handler to measure fps and update label.
 	 */
-	function onEnterFrame(event:Event):Void
+	private function onEnterFrame(event:Event):Void
 	{
 		// Increment frame count each frame. When more than a second has passed, 
 		// display number of accumulated frames and reset.
@@ -106,7 +99,7 @@ class FPSMeter extends Component
 	/**
 	 * Stops the meter if it is removed from stage.
 	 */
-	function onRemovedFromStage(event:Event):Void
+	private function onRemovedFromStage(event:Event):Void
 	{
 		stop();
 	}
@@ -130,13 +123,14 @@ class FPSMeter extends Component
 	/**
 	 * Sets or gets the prefix shown before the number. Defaults to "FPS:".
 	 */
-	public function setPrefix(value:String):String
+	public var prefix(get_prefix, set_prefix):String;
+	
+	private function set_prefix(value:String):String
 	{
 		_prefix = value;
 		return value;
 	}
-	
-	public function getPrefix():String
+	private function get_prefix():String
 	{
 		return _prefix;
 	}
@@ -144,7 +138,9 @@ class FPSMeter extends Component
 	/**
 	 * Returns the current calculated FPS.
 	 */
-	public function getFps():Int
+	public var fps(get_fps, null):Int;
+	
+	private function get_fps():Int
 	{
 		return _fps;
 	}

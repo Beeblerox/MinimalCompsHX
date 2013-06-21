@@ -28,30 +28,27 @@
 
 package com.bit101.components;
 
+import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
-class RotarySelector extends Component
+enum RotarySelectorLabelMode
 {
-	
-	public var numChoices(getNumChoices, setNumChoices):Int;
-	public var choice(getChoice, setChoice):Int;
-	public var labelMode(getLabelMode, setLabelMode):String;
-	
-	public static inline var ALPHABETIC:String = "alphabetic";
-	public static inline var NUMERIC:String = "numeric";
-	public static inline var NONE:String = "none";
-	public static inline var ROMAN:String = "roman";
-	
-	
-	var _label:Label;
-	var _labelText:String;
-	var _knob:Sprite;
-	var _numChoices:Int;
-	var _choice:Int;
-	var _labels:Sprite;
-	var _labelMode:String;
+	ALPHABETIC;
+	NUMERIC;
+	ROMAN;
+}
+
+class RotarySelector extends Component
+{	
+	private var _label:Label;
+	private var _labelText:String = "";
+	private var _knob:Sprite;
+	private var _numChoices:Int = 2;
+	private var _choice:Int = 0;
+	private var _labels:Sprite;
+	private var _labelMode:RotarySelectorLabelMode;
 	
 	
 	/**
@@ -62,14 +59,10 @@ class RotarySelector extends Component
 	 * @param label String containing the label for this component.
 	 * @param defaultHandler The event handling function to handle the default event for this component (change in this case).
 	 */
-	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0, ?label:String = "", ?defaultHandler:Dynamic->Void = null)
+	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, label:String = "", defaultHandler:Event->Void = null)
 	{
-		_labelText = "";
-		_numChoices = 2;
-		_choice = 0;
-		_labelMode = ALPHABETIC;
-		
 		_labelText = label;
+		_labelMode = RotarySelectorLabelMode.ALPHABETIC;
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -80,7 +73,7 @@ class RotarySelector extends Component
 	/**
 	 * Initializes the component.
 	 */
-	override function init():Void
+	override private function init():Void
 	{
 		super.init();
 		setSize(60, 60);
@@ -89,13 +82,11 @@ class RotarySelector extends Component
 	/**
 	 * Creates the children for this component
 	 */
-	override function addChildren():Void
+	override private function addChildren():Void
 	{
 		_knob = new Sprite();
-		
- 		_knob.buttonMode = true;
+		_knob.buttonMode = true;
 		_knob.useHandCursor = true;
-		
 		addChild(_knob);
 		
 		_label = new Label();
@@ -111,7 +102,7 @@ class RotarySelector extends Component
 	/**
 	 * Decrements the index of the current choice.
 	 */
-	function decrement():Void
+	private function decrement():Void
 	{
 		if(_choice > 0)
 		{
@@ -124,9 +115,9 @@ class RotarySelector extends Component
 	/**
 	 * Increments the index of the current choice.
 	 */
-	function increment():Void
+	private function increment():Void
 	{
-		if(Std.int(_choice) < _numChoices - 1)
+		if(_choice < _numChoices - 1)
 		{
 			_choice++;
 			draw();
@@ -137,7 +128,7 @@ class RotarySelector extends Component
 	/**
 	 * Removes old labels.
 	 */
-	function resetLabels():Void
+	private function resetLabels():Void
 	{
 		while(_labels.numChildren > 0)
 		{
@@ -151,7 +142,7 @@ class RotarySelector extends Component
 	 * Draw the knob at the specified radius.
 	 * @param radius The radius with which said knob will be drawn.
 	 */
-	function drawKnob(radius:Float):Void
+	private function drawKnob(radius:Float):Void
 	{
 		_knob.graphics.clear();
 		_knob.graphics.beginFill(Style.BACKGROUND);
@@ -186,7 +177,7 @@ class RotarySelector extends Component
 		graphics.clear();
 		graphics.lineStyle(4, Style.BACKGROUND, .5);
 		var angle:Float;
-		for (i in 0..._numChoices)
+		for(i in 0...(_numChoices))
 		{
 			angle = start + arc * i;
 			var sin:Float = Math.sin(angle);
@@ -200,20 +191,20 @@ class RotarySelector extends Component
 			lab.buttonMode = true;
 			lab.useHandCursor = true;
 			lab.addEventListener(MouseEvent.CLICK, onLabelClick);
-			if(_labelMode == ALPHABETIC)
+			if(_labelMode == RotarySelectorLabelMode.ALPHABETIC)
 			{
 				lab.text = String.fromCharCode(65 + i);
 			}
-			else if(_labelMode == NUMERIC)
+			else if(_labelMode == RotarySelectorLabelMode.NUMERIC)
 			{
 				lab.text = Std.string(i + 1);
 			}
-			else if(_labelMode == ROMAN)
+			else if(_labelMode == RotarySelectorLabelMode.ROMAN)
 			{
 				var chars:Array<String> = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 				lab.text = chars[i];
 			}
-			if(i != Std.int(_choice))
+			if(i != _choice)
 			{
 				lab.alpha = 0.5;
 			}
@@ -241,7 +232,7 @@ class RotarySelector extends Component
 	 * Internal click handler.
 	 * @param event The MouseEvent passed by the system.
 	 */
-	function onClick(event:MouseEvent):Void
+	private function onClick(event:MouseEvent):Void
 	{
 		if(mouseX < _width / 2)
 		{
@@ -253,15 +244,10 @@ class RotarySelector extends Component
 		}
 	}
 	
-	function onLabelClick(event:Event):Void
+	private function onLabelClick(event:Event):Void
 	{
-		//var lab:Label = cast(event.target, Label);
-		//choice = _labels.getChildIndex(lab);
-		#if flash
-		choice = _labels.getChildIndex(event.target);
-		#else
-		choice = _labels.getChildIndex(event.target.parent);
-		#end
+		var lab:Label = cast(event.target, Label);
+		choice = _labels.getChildIndex(lab);
 	}
 	
 	
@@ -274,17 +260,15 @@ class RotarySelector extends Component
 	/**
 	 * Gets / sets the number of available choices (maximum of 10).
 	 */
-	public function setNumChoices(value:Int):Int
+	public var numChoices(get_numChoices, set_numChoices):Int;
+	
+	private function set_numChoices(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_numChoices = Std.int(Math.min(value, 10));
-			draw();
-		}
+		_numChoices = Std.int(Math.min(value, 10));
+		draw();
 		return value;
 	}
-	
-	public function getNumChoices():Int
+	private function get_numChoices():Int
 	{
 		return _numChoices;
 	}
@@ -292,18 +276,16 @@ class RotarySelector extends Component
 	/**
 	 * Gets / sets the current choice, keeping it in range of 0 to numChoices - 1.
 	 */
-	public function setChoice(value:Int):Int
+	public var choice(get_choice, set_choice):Int;
+	
+	private function set_choice(value:Int):Int
 	{
-		if (value >= 0)
-		{
-			_choice = Std.int(Math.max(0, Math.min(_numChoices - 1, value)));
-			draw();
-			dispatchEvent(new Event(Event.CHANGE));
-		}
+		_choice = Std.int(Math.max(0, Math.min(_numChoices - 1, value)));
+		draw();
+		dispatchEvent(new Event(Event.CHANGE));
 		return value;
 	}
-	
-	public function getChoice():Int
+	private function get_choice():Int
 	{
 		return _choice;
 	}
@@ -311,14 +293,15 @@ class RotarySelector extends Component
 	/**
 	 * Specifies what will be used as labels for each choice. Valid values are "alphabetic", "numeric", and "none".
 	 */
-	public function setLabelMode(value:String):String
+	public var labelMode(get_labelMode, set_labelMode):RotarySelectorLabelMode;
+	
+	private function set_labelMode(value:RotarySelectorLabelMode):RotarySelectorLabelMode
 	{
 		_labelMode = value;
 		draw();
 		return value;
 	}
-	
-	public function getLabelMode():String
+	private function get_labelMode():RotarySelectorLabelMode
 	{
 		return _labelMode;
 	}
