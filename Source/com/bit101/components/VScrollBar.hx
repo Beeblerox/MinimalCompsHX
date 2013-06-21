@@ -42,5 +42,6 @@ class VScrollBar extends ScrollBar
 	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float = 0, ?defaultHandler:Dynamic->Void = null)
 	{
 		super(Slider.VERTICAL, parent, xpos, ypos, defaultHandler);
+		name = "VScrollBar";
 	}
 }

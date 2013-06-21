@@ -75,8 +75,9 @@ class Component implements IEventDispatcher
 	public var visible(getVisible, setVisible):Bool;
 	public var graphics(getGraphics, null):Graphics;
 	public var parent(default, null):Dynamic;
-  public var component (getComponent, null) : Sprite;
+	public var component (getComponent, null) : Sprite;
 	public var alpha(getAlpha, setAlpha):Float;
+	public var name (getName, setName) : String;
 	
 	public var tag(getTag, setTag):Int;
 	public var enabled(getEnabled, setEnabled):Bool;
@@ -88,7 +89,7 @@ class Component implements IEventDispatcher
 	var _tag:Int;
 	var _enabled:Bool;
 	var _parent:Dynamic;
-	
+
 	public static var DRAW:String = "draw";
 
 	/**
@@ -100,6 +101,7 @@ class Component implements IEventDispatcher
 	public function new(?parent:Dynamic = null, ?xpos:Float = 0, ?ypos:Float =  0)
 	{
 		_comp = new Sprite();
+		_comp.name = "Component";
 		_width = 0;
 		_height = 0;
 		_tag = -1;
@@ -184,6 +186,11 @@ class Component implements IEventDispatcher
 	{
 		_comp.addEventListener(type, listener, useCapture, priority, useWeakReference);
 	}
+
+	public function addWeakListener (type : String, listener : Dynamic -> Void, ?useCapture : Bool = false, ?priority : Int = 0) : Void
+	{
+		_comp.addEventListener (type, listener, useCapture, priority, true);
+	}
 	
 	public function dispatchEvent(event:Event):Bool 
 	{
@@ -205,8 +212,15 @@ class Component implements IEventDispatcher
 		return _comp.willTrigger( type );
 	}
 	
-	public function startDrag() 
+	public function startDrag(?onStage : Bool = false)
 	{
+		if (onStage)
+		{
+			var p = localToGlobal (new Point (0, 0));
+			stage.addChild (_comp);
+			x = p.x;
+			y = p.y;
+		}
 		_comp.startDrag();
 	}
 	
@@ -524,18 +538,29 @@ class Component implements IEventDispatcher
 		return val;
 	}
 
-  public function hide () : Void
-  {
-    _comp.visible = false;
-  }
+	public function getName () : String
+	{
+		return _comp.name;
+	}
 
-  public function show () : Void
-  {
-    _comp.visible = true;
-  }
+	public function setName (n : String) : String
+	{
+		_comp.name = n;
+		return _comp.name;
+	}
 
-  public function getComponent () : Sprite
-  {
-    return _comp;
-  }
+	public function hide () : Void
+	{
+		_comp.visible = false;
+	}
+
+	public function show () : Void
+	{
+		_comp.visible = true;
+	}
+
+	public function getComponent () : Sprite
+	{
+		return _comp;
+	}
 }

@@ -84,6 +84,7 @@ class ItemsView extends Component
     
     
     super(parent, xpos, ypos);
+    name = "ItemsView";
   }
   
   /**
@@ -105,11 +106,14 @@ class ItemsView extends Component
   {
     super.addChildren();
     _panel = new Panel(this, 0, 0);
+    _panel.name = "ItemsView._panel";
     _panel.color = _defaultColor;
     _itemHolder = new Sprite();
+    _itemHolder.name = "ItemsView._itemHolder";
     _panel.content.addChild(_itemHolder);
     _scrollbar = new VScrollBar(this, 0, 0, onScroll);
     _scrollbar.setSliderParams(0, 0, 0);
+    _scrollbar.name = "ItemsView._scrollbar";
   }
   
   /**
@@ -137,7 +141,7 @@ class ItemsView extends Component
         for (column in 0..._model.columnCount)
         {
           var w : Float = _model.getItemWidth (column, _width);
-          var item : ViewItem = _model.data (offset + i, column);
+          var item : ViewItemBase = _model.data (offset + i, column);
           item.x = xpos;
           item.y = i * itemHeight;
 
