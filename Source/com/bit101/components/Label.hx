@@ -29,6 +29,7 @@
 package com.bit101.components;
 
 import flash.display.DisplayObjectContainer;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
@@ -41,6 +42,10 @@ class Label extends Component
 	private var _text:String = "";
 	private var _tf:TextField;
 	
+	#if !flash
+	var _clickableArea:Sprite;
+	#end
+	
 	/**
 	 * Constructor
 	 * @param parent The parent DisplayObjectContainer on which to add this Label.
@@ -51,6 +56,11 @@ class Label extends Component
 	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, text:String = "")
 	{
 		this.text = text;
+		
+		#if !flash
+		_clickableArea = new Sprite();
+		#end
+		
 		super(parent, xpos, ypos);
 	}
 	
@@ -79,6 +89,11 @@ class Label extends Component
 		_tf.text = _text;			
 		addChild(_tf);
 		draw();
+		
+		#if !flash
+		addChild(_clickableArea);
+		_clickableArea.alpha = 0.0;
+		#end
 	}
 	
 	
@@ -107,6 +122,13 @@ class Label extends Component
 			_tf.width = _width;
 		}
 		_height = _tf.height = 18;
+		
+		#if !flash
+		_clickableArea.graphics.clear();
+		_clickableArea.graphics.beginFill(0);
+		_clickableArea.graphics.drawRect(0, 0, _width, height);
+		_clickableArea.graphics.endFill();
+		#end
 	}
 	
 	///////////////////////////////////

@@ -42,8 +42,11 @@ class RadioButton extends Component
 	private var _labelText:String = "";
 	private var _groupName:String = "defaultRadioGroup";
 	
-	private static var buttons:Array<RadioButton>;
+	#if !flash
+	private var _clickableArea:Sprite;
+	#end
 	
+	private static var buttons:Array<RadioButton>;
 	
 	/**
 	 * Constructor
@@ -58,6 +61,11 @@ class RadioButton extends Component
 		RadioButton.addButton(this);
 		_selected = checked;
 		_labelText = label;
+		
+		#if !flash
+		_clickableArea = new Sprite();
+		#end
+		
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -129,6 +137,11 @@ class RadioButton extends Component
 		_label = new Label(this, 0, 0, _labelText);
 		draw();
 		
+		#if !flash
+		addChild(_clickableArea);
+		_clickableArea.alpha = 0.0;
+		#end
+		
 		mouseChildren = false;
 	}
 	
@@ -160,6 +173,13 @@ class RadioButton extends Component
 		_label.draw();
 		_width = _label.width + 12;
 		_height = 10;
+		
+		#if !flash
+		_clickableArea.graphics.clear();
+		_clickableArea.graphics.beginFill(0);
+		_clickableArea.graphics.drawRect(0, 0, _width, height);
+		_clickableArea.graphics.endFill();
+		#end
 	}
 	
 	
@@ -235,5 +255,5 @@ class RadioButton extends Component
 	{
 		_groupName = value;
 		return value;
-	}	
+	}
 }

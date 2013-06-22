@@ -40,6 +40,9 @@ class CheckBox extends Component
 	private var _labelText:String = "";
 	private var _selected:Bool = false;
 	
+	#if !flash
+	private var _clickableArea:Sprite;
+	#end
 	
 	/**
 	 * Constructor
@@ -52,6 +55,11 @@ class CheckBox extends Component
 	public function new(parent:DisplayObjectContainer = null, xpos:Float = 0, ypos:Float =  0, label:String = "", defaultHandler:MouseEvent->Void = null)
 	{
 		_labelText = label;
+		
+		#if !flash
+		_clickableArea = new Sprite();
+		#end
+		
 		super(parent, xpos, ypos);
 		if(defaultHandler != null)
 		{
@@ -91,6 +99,11 @@ class CheckBox extends Component
 		_label = new Label(this, 0, 0, _labelText);
 		draw();
 		
+		#if !flash
+		addChild(_clickableArea);
+		_clickableArea.alpha = 0.0;
+		#end
+		
 		addEventListener(MouseEvent.CLICK, onClick);
 	}
 	
@@ -122,6 +135,13 @@ class CheckBox extends Component
 		_label.y = (10 - _label.height) / 2;
 		_width = _label.width + 12;
 		_height = 10;
+		
+		#if !flash
+		_clickableArea.graphics.clear();
+		_clickableArea.graphics.beginFill(0);
+		_clickableArea.graphics.drawRect(0, 0, _width, height);
+		_clickableArea.graphics.endFill();
+		#end
 	}
 	
 	
