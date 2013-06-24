@@ -29,7 +29,6 @@
 
 package com.bit101.components;
 import flash.text.Font;
-import openfl.Assets;
 
 @:font("assets/pf_ronda_seven.ttf") class RondaSevenFont extends Font {}
 
